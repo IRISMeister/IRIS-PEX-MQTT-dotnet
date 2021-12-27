@@ -49,6 +49,7 @@ $ docker-compose down
 |From_MQTT_PEX|/ID_123/XGH/EKG/PEX|
 |From_MQTT_PEX2|/ID_123/XGH/EKG/PEX2|
 |From_MQTT_PEX3|/ID_123/XGH/EKG/PEX3|
+|From_MQTT_PEX4|/ID_123/XGH/EKG/PEX4|
 |From_MQTT_PT|/ID_123/XGH/EKG/PT|
 
 下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
