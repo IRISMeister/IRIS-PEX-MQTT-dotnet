@@ -182,10 +182,11 @@ root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
 ```
 
-avro schemaからC#クラスを作成。(dotnet31-dev使用時のみ可能)
+[Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成。(dotnet31-dev使用時のみ可能)
 ```
 root@80352f0c46d2:~#. dotnet/tools/avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
 ```
+(参考) https://engineering.chrobinson.com/dotnet-avro/guides/cli-generate/
 
 ## 参考にしたコードサンプル
 https://github.com/intersystems/Samples-PEX-Course
