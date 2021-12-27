@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"name": "MQTT",
+			"path": "."
+		}
+	],
+	"settings": {
+        "objectscript.conn": {
+            "active": false,
+            "links": {
+                "Production": "http://localhost:${port}/csp/${ns}/EnsPortal.ProductionConfig.zen?$NAMESPACE=INTEROP&PRODUCTION=Solution.MQTT",
+                "Rule": "http://localhost:${port}/csp/${ns}/EnsPortal.RuleEditor.zen?RULE=dc.Demo.FilterPostsRoutingRule"
+            },
+            "host": "localhost",
+            "port": 52773,
+            "username": "SuperUser",
+            "password": "demo",
+            "ns": "interop",
+            "https": false,
+            "docker-compose": {
+                "service": "iris"
+            }
+        },
+        "objectscript.conn.password": "demo",
+        "objectscript.conn.docker-compose.service": "iris",
+        "objectscript.conn.active": true
+        
+    },
+    "objectscript.conn.docker-compose": {}
+}
