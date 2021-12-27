@@ -2,6 +2,9 @@
 
 namespace dc
 {
+    /// <summary>
+    /// a sample class to encode AVRO.
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
