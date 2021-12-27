@@ -17,6 +17,9 @@ using Avro.Generic;
 
 namespace dc
 {
+    /// <summary>
+    /// a sample class to call IRIS APIs from standalone app.
+    /// </summary>
     class Program
     {
         static void Main(string[] args)

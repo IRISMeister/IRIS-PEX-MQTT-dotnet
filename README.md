@@ -28,20 +28,21 @@ $ docker-compose down
 
 |BS|送信先|備考|
 |:--|:--|:--|
-|From_MQTT_EXT|Process_MQTT|External Language明示使用。下記PEX利用を推奨|
-|From_MQTT_PEX|Process_MQTT|PEX使用。配列を完全にリレーショナル化する例|
-|From_MQTT_PEX2|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージをIRISで作成する例|
-|From_MQTT_PEX3|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージをPEXで作成する例|
+|From_MQTT_EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨|
+|From_MQTT_PEX|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|
+|From_MQTT_PEX2|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|
+|From_MQTT_PEX3|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|
+|From_MQTT_PEX4|Process_MQTT|PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例|
 |From_MQTT_PT|Decode_MQTT_PEX|標準のPassThroughサービスを使用|
 
 # データの送信方法
-## コマンドライン
+## 送信する
 ```
-$ docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -m "90"
+# docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
 ```
 上記コマンドを実行すると、From_MQTT_PTがMQTTメッセージを受信し、その後の処理が実行されます。
 
-ただし、各BSは以下のTopicをSubscribeする設定になっています。
+ただし、各BSは、以下のTopicをSubscribeする設定になっています。いずれも[SimpleClass.avsc](datavol/share/SimpleClass.avsc)でエンコードされたデータを受け付けます。
 |受信するBS|Topic|
 |:--|:--|
 |From_MQTT_EXT|/ID_123/XGH/EKG/EXT|  
@@ -50,29 +51,27 @@ $ docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/
 |From_MQTT_PEX3|/ID_123/XGH/EKG/PEX3|
 |From_MQTT_PT|/ID_123/XGH/EKG/PT|
 
-
-
-必要に応じてサブスクライブも可能です。
+下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
+```
+$ docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
+```
+必要に応じてサブスクライブ出来ます。
 ```
 $ docker-compose exec iris mosquitto_sub -v -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/#
 ```
-
-## (バイナリ)ファイルを送る方法
-バイナリファイルを下記で作成します。
+## 送信用の(バイナリ)ファイルを作成する
+バイナリファイルを下記で作成します。  
 [BinaryEncoder.py](datavol/share/BinaryEncoder.py)はintの[配列](datavol/share/BinaryEncoder.avsc)がavroエンコードされたファイルを作成します。  
-[SimpleClass-decoder.py](datavol/share/SimpleClass-decoder.py)は[record](datavol/share/SimpleClass.avsc)がavroエンコードされたファイルを作成します。  
-[testdata.py](datavol/share/testdata.py)は単純なlong型の配列です。
+[SimpleClass-encoder.py](datavol/share/SimpleClass-encoder.py)は[record](datavol/share/SimpleClass.avsc)がavroエンコードされたファイルを作成します。  
+[testdata.py](datavol/share/testdata.py)は単純なlong型の配列を様々なサイズで作成します(AVROは無関係)。
 ```
 $ docker-compose exec python bash
 root@d20238018cbc:~# cd share/
-root@d20238018cbc:~/share# python testdata.py
 root@d20238018cbc:~/share# python BinaryEncoder.py
 root@d20238018cbc:~/share# python SimpleClass-decoder.py
+root@d20238018cbc:~/share# python testdata.py
 ```
 
-```
-# mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
-```
 
 # その他
 ## MQTTクライアント機能を直接使用する方法
