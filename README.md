@@ -182,7 +182,7 @@ root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
 ```
 
-avro schemaからC#クラスを作成。(dotnet31-dev使用時のみ)
+avro schemaからC#クラスを作成。(dotnet31-dev使用時のみ可能)
 ```
 root@80352f0c46d2:~#. dotnet/tools/avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
 ```
