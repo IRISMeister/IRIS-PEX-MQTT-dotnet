@@ -14,8 +14,8 @@ Ubuntsuは、[ubuntu-20.04.1-live-server-amd64.iso](http://old-releases.ubuntu.c
 
 # 起動方法
 ```
-$ git clone https://github.com/IRISMeister/Samples-MQTT-EKG-Devices.git
-$ cd Samples-MQTT-EKG-Devices
+$ git clone https://github.com/IRISMeister/IRIS-PEX-MQTT-dotnet.git
+$ cd IRIS-PEX-MQTT-dotnet
 $ ./setup.sh
 $ docker-compose up -d
 ```
@@ -212,11 +212,11 @@ total 2072
 ## その他
 
 ### XEP
-AVROのReflectReaderで期待されるc#クラスはset/getが必要な模様。無いと'Class SimpleClass doesnt contain property XXX'、というエラーになる。
+AVROのReflectReaderで期待されるc#クラスはset/getが必要な模様(Reflectionを使用しているため)。無いと'Class SimpleClass doesnt contain property XXX'、というエラーになる。
 ```c#
     public int? myUInt { get; set; }
 ```
-XEPはこのシンタックスを理解しない。具体的にはImportSchema()時のObjectScript側のクラスはこのような定義となる。
+XEPはImportSchema()時、このシンタックスシュガーを下記のように理解する。
 ```ObjectScript
 Property "<myUInt>k__BackingField" As %Library.Integer;
 ```
@@ -225,7 +225,17 @@ index定義の際は、この名称を使用する必要がある。また、SQL
 [Index(name = "idx1", fields = new string[] { "<myLong>k__BackingField" }, type = IndexType.simple)]
 
 ```
-別途、器となるクラスを用意して中身をCOPYしたほうが、健全かもしれない。  
+下記のような書き換えを行うと良い。
+
+```c#
+private int? p_myUInt;
+
+public int? myUInt
+{
+    get { return p_myUInt; }
+    set { p_myUInt = value; }
+}
+```
 
 ### スキーマの変更への追随
 XEPに限らないが、メッセージになるクラス(src/Solution/SimpleClass.cls)をコンパイルする際には、IRIS側のクラス(src/dc/SimpleClass.cls)が必要になる。そのため、既存メッセージが変更されたり、新しいメッセージが追加される際には、下記を動的に行う仕組みが必要となる。

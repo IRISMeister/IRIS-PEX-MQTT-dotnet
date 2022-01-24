@@ -1,4 +1,4 @@
-ARG IMAGE=store/intersystems/iris-community:2021.2.0.617.0
+ARG IMAGE=store/intersystems/iris-community:2021.2.0.649.0
 FROM $IMAGE
 
 USER root
