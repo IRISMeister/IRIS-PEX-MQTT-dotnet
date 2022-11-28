@@ -8,7 +8,7 @@ ENV ISC_LIBDIR ${ISC_PACKAGE_INSTALLDIR}/dev/dotnet/bin/Core21
 WORKDIR /source
 # Can't use 2021.1... It lacks InterSystems.EnsLib.*
 # MQTTService3.cs(7,49): error CS0234: The type or namespace name 'EnsLib' does not exist in the namespace 'InterSystems' (are you missing an assembly reference?) [/source/mylib1/mylib1.csproj]
-COPY --from=store/intersystems/iris-community:2021.2.0.617.0 $ISC_LIBDIR/*.nupkg $GWLIBDIR/
+COPY --from=containers.intersystems.com/intersystems/iris-community:2022.1.0.209.0 $ISC_LIBDIR/*.nupkg $GWLIBDIR/
 
 # copy csproj and restore as distinct layers
 #COPY *.csproj ./
