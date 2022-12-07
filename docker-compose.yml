@@ -30,7 +30,7 @@ services:
     hostname: netgw
     image: intersystemsdc/pexservice:latest
     build:
-      context: dotnet
+      context: netgw
       dockerfile: Dockerfile
     restart: always
     ports: 

@@ -9,4 +9,4 @@ ENV ISC_LIBDIR ${ISC_PACKAGE_INSTALLDIR}/dev/dotnet/bin/net6.0
 WORKDIR /source
 COPY *.sh ./
 COPY Sample .
-COPY --from=containers.intersystems.com/intersystems/iris-community:2022.3.0.545.0 $ISC_LIBDIR/* $GWLIBDIR/
+COPY --from=containers.intersystems.com/intersystems/iris-community:2022.2.0.368.0 $ISC_LIBDIR/* $GWLIBDIR/
