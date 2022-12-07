@@ -2,10 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RestoreSources>$(RestoreSources);$(GWLIBDIR);https://api.nuget.org/v3/index.json</RestoreSources>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <GenerateDependencyFile>true</GenerateDependencyFile>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   
   <ItemGroup>
