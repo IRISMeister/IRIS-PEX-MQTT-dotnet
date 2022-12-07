@@ -24,21 +24,25 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTProcess</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
   </Item>
   <Item Name="NoOp_PEX" Category="" ClassName="EnsLib.PEX.BusinessOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTOperationNoOp</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
   </Item>
   <Item Name="Decode_MQTT_PEX" Category="" ClassName="EnsLib.PEX.BusinessOperation" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTOperation</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
   </Item>
   <Item Name="From_MQTT_PEX" Category="" ClassName="Solution.BS.MQTTPEX" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTService</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
     <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
@@ -47,6 +51,7 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTService2</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
     <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX2/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
@@ -55,15 +60,8 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTService3</Setting>
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
+    <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
     <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX3/#</Setting>
-    <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
-    <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
-  </Item>
-  <Item Name="From_MQTT_PEX4" Category="" ClassName="Solution.BS.MQTTPEX" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Host" Name="%remoteClassname">dc.MQTTService4</Setting>
-    <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
-    <Setting Target="Host" Name="%gatewayPort">55556</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX4/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
   </Item>

@@ -1,11 +1,11 @@
-ARG IMAGE=containers.intersystems.com/intersystems/iris-community:2022.1.0.209.0
+ARG IMAGE=containers.intersystems.com/intersystems/iris-community:2022.3.0.545.0
 FROM $IMAGE
 
 USER root
 
 # Japanese language pack 
 RUN apt -y update \
- && DEBIAN_FRONTEND=noninteractive apt -y install language-pack-ja-base language-pack-ja ibus-mozc 
+ && DEBIAN_FRONTEND=noninteractive apt -y install language-pack-ja-base language-pack-ja
 
 # installing vim just for convenience
 RUN apt -y update \

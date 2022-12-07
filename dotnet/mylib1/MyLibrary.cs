@@ -6,13 +6,13 @@ using InterSystems.Data.IRISClient.ADO;
 //for ADO.NET
 using InterSystems.Data.IRISClient;
 //for XEP
-using InterSystems.XEP;
+//using InterSystems.XEP;
 
 namespace dc
 {
     public class MyLibrary
     {
-        EventPersister xepPersister = PersisterFactory.CreatePersister();
+        //EventPersister xepPersister = PersisterFactory.CreatePersister();
 
 	    public IRISObject DoSomethingNative(String mqtttopic, String mqttmsg)
         {
@@ -184,7 +184,7 @@ namespace dc
 
             return request;
         }
-
+/*
         public void XEPImport(string classFullName)
         {
             XEPConnect();
@@ -213,6 +213,7 @@ namespace dc
             Event xepEvent = xepPersister.GetEvent(classFullName, Event.INDEX_MODE_SYNC);
             xepEvent.Store(e);
             xepEvent.Close();
-        }        
+        } 
+*/       
     }
 }

@@ -37,6 +37,8 @@ namespace dc
              * How to deserialize MQTT message.
              */ 
             dc.MyLibrary my = new dc.MyLibrary();
+            Console.WriteLine("GetNumber():"+my.GetNumber()); //test 
+
             try {
                 IRISObject msg = my.GetEnsLibMQTT(iris_object_id);
                 byte[] b = msg.GetBytes("StringValue");

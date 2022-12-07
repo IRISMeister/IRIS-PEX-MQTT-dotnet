@@ -1,37 +1,37 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
 ENV ISC_PACKAGE_INSTALLDIR /usr/irissys
 ENV GWLIBDIR lib
-ENV ISC_LIBDIR ${ISC_PACKAGE_INSTALLDIR}/dev/dotnet/bin/Core21
+ENV ISC_LIBDIR ${ISC_PACKAGE_INSTALLDIR}/dev/dotnet/bin/net6.0
 
 WORKDIR /source
-# Can't use 2021.1... It lacks InterSystems.EnsLib.*
-# MQTTService3.cs(7,49): error CS0234: The type or namespace name 'EnsLib' does not exist in the namespace 'InterSystems' (are you missing an assembly reference?) [/source/mylib1/mylib1.csproj]
-COPY --from=containers.intersystems.com/intersystems/iris-community:2022.1.0.209.0 $ISC_LIBDIR/*.nupkg $GWLIBDIR/
+COPY --from=containers.intersystems.com/intersystems/iris-community:2022.3.0.545.0 $ISC_LIBDIR/* $GWLIBDIR/
 
-# copy csproj and restore as distinct layers
-#COPY *.csproj ./
+# copy project files
 COPY . .
-RUN cp -fR $GWLIBDIR mylib1/
-RUN dotnet restore mylib1/mylib1.csproj && dotnet restore myapp/myapp.csproj 
 
-# copy and publish app and libraries
-#COPY . .
+# make an empty folder
+RUN mkdir mylib1/lib 
+RUN dotnet restore 
+
 RUN dotnet publish -c release -o /app
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/core/runtime:2.1
+FROM mcr.microsoft.com/dotnet/runtime:6.0
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
 
 WORKDIR /app
-COPY --from=build /app ./
 
-# Configs to start the Gateway Server
-RUN cp mylib1.runtimeconfig.json IRISGatewayCore21.runtimeconfig.json && \
-    cp mylib1.deps.json IRISGatewayCore21.deps.json
+# copy GatewayLinux
+COPY --from=build /source/lib ./
+
+# copy published files
+COPY --from=build /app ./
 
 ENV PORT 55556
 
-CMD dotnet IRISGatewayCore21.dll $PORT netgw.log netgw 0.0.0.0
+#for debug
+#CMD sleep 10000
+CMD ./InterSystems.Data.GatewayLinux $PORT netgw.log netgw 0.0.0.0

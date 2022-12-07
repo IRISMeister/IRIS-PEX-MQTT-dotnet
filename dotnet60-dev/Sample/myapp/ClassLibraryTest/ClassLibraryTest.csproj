@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\mylib\ClassLibrary\ClassLibrary.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="InterSystems.Data.IRISClient">
+      <HintPath>/source/lib/InterSystems.Data.IRISClient.dll</HintPath>
+    </Reference>
+    <Reference Include="InterSystems.Data.Utils.dll">
+      <HintPath>/source/lib/InterSystems.Data.Utils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
