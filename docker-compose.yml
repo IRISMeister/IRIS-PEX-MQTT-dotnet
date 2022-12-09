@@ -60,5 +60,5 @@ services:
     environment:
       - TZ=JST-9      
     volumes:
-      - ./dotnet:/source2
+      - ./natgw:/source2
       - ./datavol/share:/share
