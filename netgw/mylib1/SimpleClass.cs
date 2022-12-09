@@ -20,12 +20,12 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-using Index = InterSystems.XEP.Attributes.Index;
-using IndexType = InterSystems.XEP.Attributes.IndexType;
+//using Index = InterSystems.XEP.Attributes.Index;
+//using IndexType = InterSystems.XEP.Attributes.IndexType;
 
 namespace dc
 {
-[Index(name = "idx1", fields = new string[] { "<myLong>k__BackingField" }, type = IndexType.simple)]
+//[Index(name = "idx1", fields = new string[] { "<myLong>k__BackingField" }, type = IndexType.simple)]
 public class SimpleClass
 {
    public static string SCHEMA = @"{""protocol"" : ""MyProtocol"",""type"":""record"",""name"":""SimpleClass"",""namespace"":""foo"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""bytes""}},{""name"":""myMap"",""type"":{""type"":""map"",""values"":""string""}}]}";

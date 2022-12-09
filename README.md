@@ -97,7 +97,7 @@ INTEROP>w $SYSTEM.external.getRemoteGateway("netgw",55556).new("System.DateTime"
 2021-11-19 03:51:03.4967784
 
 INTEROP>Set gw=$SYSTEM.external.getRemoteGateway("netgw",55556)
-INTEROP>do gw.addToPath("/app/MyLibrary.dll")
+INTEROP>do gw.addToPath("/app/mylib1.dll")
 INTEROP>set proxy = gw.new("dc.MyLibrary")
 INTEROP>w proxy.GetNumber()
 123
@@ -135,6 +135,8 @@ SDKは含まれないのでbuildは出来ません。
 ```
 $ docker-compose exec netgw bash
 root@f718a9177d25:/app# dotnet myapp.dll
+もしくは
+root@f718a9177d25:/app# ./myapp
 ```
 ## 単体実行用に.NETアプリケーションをビルド
 SDKが含まれています。
