@@ -1,4 +1,7 @@
-dotnet/genavro/obj
-dotnet/myapp/obj
-dotnet/mylib1/obj
+netgw/genavro/obj
+netgw/myapp/obj
+netgw/mylib1/obj
 
+
+dotnet60-dev/Sample/myapp/ClassLibraryTest/obj
+dotnet60-dev/Sample/mylib/ClassLibrary/obj
