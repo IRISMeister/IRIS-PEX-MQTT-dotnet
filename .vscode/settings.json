@@ -12,6 +12,6 @@
     "objectscript.conn": {
         "server": "iris",
         "ns": "INTEROP",
-        "active": true
+        "active": false
     }
 }
