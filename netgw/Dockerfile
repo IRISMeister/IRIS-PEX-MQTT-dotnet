@@ -27,6 +27,9 @@ WORKDIR /app
 # copy GatewayLinux
 COPY --from=build /source/lib ./
 
+# Temporal fix
+COPY DP-419090/net6.0/InterSystems.Data.GatewayLinux ./
+
 # copy published files
 COPY --from=build /app ./
 
