@@ -210,6 +210,33 @@ total 2072
 -rwxr-xr-x 1 root root 2120800 Nov 29 13:47 mosquitto
 ```
 
+## irisとdotnet gatewayを同居させる場合
+本例はdotnet gateway(コンテナnetgw)と、IRISを別のコンテナとして起動していますが、IRISに同居させることも可能です。その場合、Gatewayサーバの管理はIRISの管理下で行うのが便利です。
+
+```
+$ docker-compose exec -u root iris bash
+root@iris:/opt/irisbuild# apt update
+root@iris:/opt/irisbuild# apt install -y dotnet6
+root@iris:/opt/irisbuild# exit
+```
+
+.bashrcに修正を加え、いったんコンテナにログインし直した後、irisを再起動します。
+```
+$ docker-compose exec iris bash
+irisowner@iris:/opt/irisbuild$ echo "export DOTNET_ROOT=/usr/lib/dotnet" >> ~/.bashrc
+irisowner@iris:/opt/irisbuild$ exec bash -l
+irisowner@iris:/opt/irisbuild$ iris restart iris
+irisowner@iris:/opt/irisbuild$ exit
+```
+
+Gatewayを利用します。IRIS管理下にあるGatewayは、API($system.external.getDotNetGateway())を利用時に自動起動します。
+```
+$ docker-compose exec iris bash
+irisowner@iris:/opt/irisbuild$ iris session iris
+USER>w $system.external.getDotNetGateway().new("System.DateTime",0).Now
+2022-12-12 06:38:36.3759392
+USER>
+```
 
 ## その他
 
