@@ -1,4 +1,4 @@
 #!/bin/bash
 
 chmod 777 datavol
-chmod 777 datavol/App
+chmod 777 datavol/share
