@@ -3,14 +3,9 @@
 |用途|O/S|ホストタイプ|IP|
 |:--|:--|:--|:--|
 |クライアントPC|Windows10 Pro|物理ホスト|192.168.11.5/24|
-|Docker環境|Ubuntsu 20.04.1 LTS|上記Windows10上の仮想ホスト(vmware)|192.168.11.48/24|
+|Docker環境|Ubuntsu 22.04.2 LTS|上記Windows10上の仮想ホスト(vmware)|192.168.11.48/24|
 
 Ubuntsuは、[ubuntu-20.04.1-live-server-amd64.iso](http://old-releases.ubuntu.com/releases/20.04.1/ubuntu-20.04.1-live-server-amd64.iso)を使用して、最低限のサーバ機能のみをインストールしました。
-
-また、Windowsのhostsファイルに、irishostを登録しています。 
-```
-192.168.11.48 irishost
-```
 
 # 起動方法
 ```
@@ -19,6 +14,11 @@ $ cd Samples-MQTT-EKG-Devices
 $ ./setup.sh
 $ docker-compose up -d
 ```
+
+[管理ポータル](http://localhost:52873/csp/sys/%25CSP.Portal.Home.zen?$NAMESPACE=INTEROP)
+
+_SYSTEM/SYS
+
 # 停止(削除)方法
 ```
 $ docker-compose down
@@ -75,6 +75,13 @@ root@d20238018cbc:~/share# python testdata.py
 
 
 # その他
+
+## brokerのログ
+
+```
+docker compose exec mqttbroker tail -f /mosquitto/log/mosquitto.log
+```
+
 ## MQTTクライアント機能を直接使用する方法
 ```
 $ docker-compose exec iris iris session iris
