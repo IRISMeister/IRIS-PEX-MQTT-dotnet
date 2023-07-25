@@ -5,7 +5,7 @@ ROUTINE MQTTClient
 Connect
     Set KeepAliveInterval=30 // default is $$$KeepAliveInterval=60
     Set m=##class(%Net.MQTT.Client).%New("tcp://mqttbroker:1883","myclient")
-    Set tSC=m.Connect()
+    Set tSC=m.Connect(,,0) ; i believe clean session should be 0 to use persistent session 
     Set tSC=m.Subscribe("/ID_123/XGH/EKG/PT/#")
 
     Return
