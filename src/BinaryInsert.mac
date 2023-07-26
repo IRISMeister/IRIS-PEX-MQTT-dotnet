@@ -1,0 +1,30 @@
+ROUTINE BinaryInsert
+FILL
+    &SQL(TRUNCATE TABLE DWH.LOGS)
+
+    Set topic="abcde"
+    Set binary=""
+    For i = 0:1:1000 {
+    Set binary=binary_$C(i # 256)
+    }
+
+    For repeat=1:1:1 {
+
+    Set st=$ZH	 
+    for i=1:1:3000 {
+    set now=$ZDATETIME($H,3)
+    &SQL(insert into DWH.LOGS (SENT_AT,TOPIC,RECEIVED_AT,BINARY) VALUES (:now,:topic,:now,:binary))
+    If SQLCODE'=0 b
+    }
+    Set elapsed=$ZH-st
+    If elapsed>1 {
+        w "Took longer than 1 seconds!",!
+        b 
+    }
+    Else {
+        w elapsed,!
+    }
+    H 1-elapsed
+    }
+ 
+    Return
