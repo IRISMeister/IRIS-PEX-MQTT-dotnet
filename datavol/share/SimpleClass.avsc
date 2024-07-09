@@ -11,7 +11,7 @@
          { "name" : "myFloat", "type" : "float" },
          { "name" : "myBytes", "type" : "bytes" },
          { "name" : "myString", "type" : "string" },
-         { "name" : "myArray", "type" : { "type" : "array", "items" : "bytes" } },
+         { "name" : "myArray", "type" : { "type" : "array", "items" : "long" } },
          { "name" : "myMap", "type" : { "type" : "map", "values" : "string" } }
    ]
 }

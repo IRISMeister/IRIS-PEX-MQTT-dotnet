@@ -12,7 +12,7 @@ Ubuntsuは、[ubuntu-20.04.1-live-server-amd64.iso](http://old-releases.ubuntu.c
 $ git clone https://github.com/IRISMeister/Samples-MQTT-EKG-Devices.git
 $ cd Samples-MQTT-EKG-Devices
 $ ./setup.sh
-$ docker-compose up -d
+$ docker compose up -d
 ```
 
 [管理ポータル](http://localhost:52873/csp/sys/%25CSP.Portal.Home.zen?$NAMESPACE=INTEROP)
@@ -21,24 +21,24 @@ _SYSTEM/SYS
 
 # 停止(削除)方法
 ```
-$ docker-compose down
+$ docker compose down
 ```
 
 # MQTT受信用のビジネスサービスについて
 
-|BS|送信先|備考|
-|:--|:--|:--|
-|From_MQTT_EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨|
-|From_MQTT_PEX|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|
-|From_MQTT_PEX2|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|
-|From_MQTT_PEX3|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|
-|From_MQTT_PEX4|Process_MQTT|PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例|
-|From_MQTT_PT|Decode_MQTT_PEX|標準のPassThroughサービスを使用|
+|BS|送信先|備考|格納先テーブル|
+|:--|:--|:--|:--|
+|From_MQTT_EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨||
+|From_MQTT_PEX([dc.MQTTService](netgw/mylib1/MQTTService.cs))|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|Solution.RAWDATA|
+|From_MQTT_PEX2([dc.MQTTService2](netgw/mylib1/MQTTService2.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|PEX.Message|
+|From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|Solution.SimpleClass|
+|From_MQTT_PEX4(未実装)|Process_MQTT|PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例||
+|From_MQTT_PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|Solution.SimpleClass|
 
 # データの送信方法
 ## 送信する
 ```
-# docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
+# docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
 ```
 上記コマンドを実行すると、From_MQTT_PTがMQTTメッセージを受信し、その後の処理が実行されます。
 
@@ -54,22 +54,82 @@ $ docker-compose down
 
 下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
 ```
-$ docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
+$ docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
 ```
 必要に応じてサブスクライブ出来ます。
 ```
-$ docker-compose exec iris mosquitto_sub -v -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/#
+$ docker compose exec iris mosquitto_sub -v -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/#
 ```
+
+## IRIS側のデータ
+
+
+```
+SELECT ID,b.bytes
+  FROM Solution.SimpleClass as s,
+       JSON_TABLE(s.myBytes, '$'
+         COLUMNS (bytes BINARY path '$.')
+       ) as b
+
+| ID | bytes |
+| -- | -- |
+| 1 | 1 |
+| 1 | 2 |
+| 1 | 3 |
+| 1 | 4 |
+| 1 | 5 |
+| 1 | 6 |
+| 1 | 7 |
+| 1 | 8 |
+| 2 | 17 |
+| 2 | 18 |
+| 2 | 19 |
+| 2 | 20 |
+| 2 | 21 |
+| 2 | 22 |
+| 2 | 23 |
+| 2 | 24 |
+
+SELECT ID,b.bytes
+  FROM Solution.SimpleClass as s,
+       JSON_TABLE(s.myArray, '$'
+         COLUMNS (bytes BINARY path '$.')
+       ) as b
+
+| ID | bytes |
+| -- | -- |
+| 1 | 1 |
+| 1 | 2 |
+| 1 | 3 |
+| 1 | 4 |
+| 1 | 5 |
+| 1 | 6 |
+| 1 | 7 |
+| 1 | 8 |
+| 2 | 11 |
+| 2 | 12 |
+| 2 | 13 |
+| 2 | 14 |
+| 2 | 15 |
+| 2 | 16 |
+| 2 | 17 |
+| 2 | 18 |
+```
+
+> 文字列化した配列から値を取り出良い方法が2024.1まで無かった。
+
+
 ## 送信用の(バイナリ)ファイルを作成する
 バイナリファイルを下記で作成します。  
 [BinaryEncoder.py](datavol/share/BinaryEncoder.py)はintの[配列](datavol/share/BinaryEncoder.avsc)がavroエンコードされたファイルを作成します。  
 [SimpleClass-encoder.py](datavol/share/SimpleClass-encoder.py)は[record](datavol/share/SimpleClass.avsc)がavroエンコードされたファイルを作成します。  
 [testdata.py](datavol/share/testdata.py)は単純なlong型の配列を様々なサイズで作成します(AVROは無関係)。
+
 ```
-$ docker-compose exec python bash
+$ docker compose exec python bash
 root@d20238018cbc:~# cd share/
 root@d20238018cbc:~/share# python BinaryEncoder.py
-root@d20238018cbc:~/share# python SimpleClass-decoder.py
+root@d20238018cbc:~/share# python SimpleClass-encoder.py
 root@d20238018cbc:~/share# python testdata.py
 ```
 
@@ -84,7 +144,7 @@ docker compose exec mqttbroker tail -f /mosquitto/log/mosquitto.log
 
 ## MQTTクライアント機能を直接使用する方法
 ```
-$ docker-compose exec iris iris session iris
+$ docker compose exec iris iris session iris
 USER>set m=##class(%Net.MQTT.Client).%New("tcp://mqttbroker:1883")
 USER>set tSC=m.Connect()
 USER>set tSC=m.Subscribe("/ID_123/XGH/EKG/PT/#")
@@ -99,7 +159,7 @@ $
 
 ## PEXを使わずに.NETを呼び出す方法
 ```
-$ docker-compose exec iris iris session iris -U INTEROP
+$ docker compose exec iris iris session iris -U INTEROP
 INTEROP>w $SYSTEM.external.getRemoteGateway("netgw",55556).new("System.DateTime",0).Now
 2021-11-19 03:51:03.4967784
 
@@ -137,21 +197,25 @@ abc
 USER>d lstr.Add("日本語")
 日本語
 ```
-## .NETアプリケーションを呼び出す方法
-SDKは含まれないのでbuildは出来ません。
+## .NETアプリケーションの実行環境
 ```
-$ docker-compose exec netgw bash
+$ docker compose exec netgw bash
 root@f718a9177d25:/app# dotnet myapp.dll
 もしくは
 root@f718a9177d25:/app# ./myapp
 ```
-## 単体実行用に.NETアプリケーションをビルド
+
+> SDKは含まれないので、この環境ではbuildは出来ません。
+
+## 単体実行用に.NETアプリケーションをビルドする環境
+
 SDKが含まれています。
 上記の.NETアプリケーションとは別の場所(donet-devコンテナ内)にデプロイされるので注意。
 ```
-$ docker-compose exec dotnet-dev bash
-root@aa9e6466578e:/source# ./build.sh
-root@aa9e6466578e:/source# dotnet /app/myapp.dll
+$ docker compose exec dotnet-dev bash
+root@aa9e6466578e:/source# ./build.sh <== ごくシンプルなappの作成例
+root@aa9e6466578e:/source# ./build-netgw.sh <== AVROを使用した例
+root@aa9e6466578e:/source# /app/myapp
 1
 abc
 dc.MyLibrary
@@ -191,9 +255,9 @@ root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
 ```
 
-[Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成。(dotnet31-dev使用時のみ可能)
+[Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成。(dotnet60-dev使用時のみ可能)
 ```
-root@80352f0c46d2:~#. dotnet/tools/avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
+root@80352f0c46d2:~# avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
 ```
 (参考) https://engineering.chrobinson.com/dotnet-avro/guides/cli-generate/
 
@@ -221,7 +285,7 @@ total 2072
 本例はdotnet gateway(コンテナnetgw)と、IRISを別のコンテナとして起動していますが、IRISに同居させることも可能です。その場合、Gatewayサーバの管理はIRISの管理下で行うのが便利です。
 
 ```
-$ docker-compose exec -u root iris bash
+$ docker compose exec -u root iris bash
 root@iris:/opt/irisbuild# apt update
 root@iris:/opt/irisbuild# apt install -y dotnet6
 root@iris:/opt/irisbuild# exit
@@ -229,7 +293,7 @@ root@iris:/opt/irisbuild# exit
 
 .bashrcに修正を加え、いったんコンテナにログインし直した後、irisを再起動します。
 ```
-$ docker-compose exec iris bash
+$ docker compose exec iris bash
 irisowner@iris:/opt/irisbuild$ echo "export DOTNET_ROOT=/usr/lib/dotnet" >> ~/.bashrc
 irisowner@iris:/opt/irisbuild$ exec bash -l
 irisowner@iris:/opt/irisbuild$ iris restart iris
@@ -238,7 +302,7 @@ irisowner@iris:/opt/irisbuild$ exit
 
 Gatewayを利用します。IRIS管理下にあるGatewayは、API($system.external.getDotNetGateway())を利用時に自動起動します。
 ```
-$ docker-compose exec iris bash
+$ docker compose exec iris bash
 irisowner@iris:/opt/irisbuild$ iris session iris
 USER>w $system.external.getDotNetGateway().new("System.DateTime",0).Now
 2022-12-12 06:38:36.3759392

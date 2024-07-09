@@ -38,13 +38,8 @@ namespace dc
                 // get unique value via Native API
                 seqno = (long)iris.ClassMethodLong("Solution.SimpleClass", "GETNEWID");
 
-                myarray.Clear();
-                for (int j = 0; j < simple.myArray.Count; j++) {
-                    myarray.Add(String.Join(",",simple.myArray[j]));
-                }
-
                 // Pass an array as a comma separated String value.
-                newrequest = (IRISObject)iris.ClassMethodObject("Solution.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,String.Join(",",simple.myBytes),simple.myString,myarray);
+                newrequest = (IRISObject)iris.ClassMethodObject("Solution.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,"["+String.Join(",",simple.myBytes)+"]",simple.myString,"["+String.Join(",",simple.myArray)+"]");
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
                 foreach (string name in targetNames)

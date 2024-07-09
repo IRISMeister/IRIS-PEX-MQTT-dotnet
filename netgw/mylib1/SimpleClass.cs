@@ -28,7 +28,7 @@ namespace dc
 //[Index(name = "idx1", fields = new string[] { "<myLong>k__BackingField" }, type = IndexType.simple)]
 public class SimpleClass
 {
-   public static string SCHEMA = @"{""protocol"" : ""MyProtocol"",""type"":""record"",""name"":""SimpleClass"",""namespace"":""foo"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""bytes""}},{""name"":""myMap"",""type"":{""type"":""map"",""values"":""string""}}]}";
+    public static string SCHEMA = @"{""protocol"" : ""MyProtocol"",""type"":""record"",""name"":""SimpleClass"",""namespace"":""foo"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""long""}},{""name"":""myMap"",""type"":{""type"":""map"",""values"":""string""}}]}";
 
     public int myInt { get; set; }
 
@@ -44,7 +44,7 @@ public class SimpleClass
 
     public string myString { get; set; }
 
-    public List<byte[]> myArray { get; set; }
+    public List<long> myArray { get; set; }
 
     public Dictionary<string, string> myMap { get; set; }
 
@@ -59,7 +59,7 @@ public class SimpleClass
             myFloat = (float)1.59E-2,
             myBytes = new byte[8] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,},
             myString = "this is a SimpleClass",
-            myArray = new List<byte[]>() { new byte[] { 0x01, 0x02, 0x03, 0x04 } },
+            myArray = new List<long>{1,2,3,4},
             myMap = new Dictionary<string, string>()
             {
                 ["abc"] = "123"

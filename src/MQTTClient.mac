@@ -1,6 +1,6 @@
 ROUTINE MQTTClient
 #include %occStatus
- #; docker-compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/1 -f /home/irisowner/share/SimpleClass.avro
+ #; docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/1 -f /home/irisowner/share/SimpleClass.avro
 
 Main() public {
     Set m=$$Connect()

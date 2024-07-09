@@ -30,29 +30,20 @@ namespace dc
             byte[] b = req.GetBytes("StringValue");
             List<dc.SimpleClass> items = dc.ReflectReader.decode<dc.SimpleClass>(b);
 
-            const int columncount = 4;  // Number of columns (p1,p2,p3,p4...) Solution.RAWDATA has
+            const int columncount = 8;  // Number of columns (p1,p2,p3,p4...) Solution.RAWDATA has
             IRIS iris = GatewayContext.GetIRIS();
-            IRISList list = new IRISList();
             IRISObject newrequest;
-            int elementcount;
+            int elementcount;  
             foreach (dc.SimpleClass simple in items)
             {
-                elementcount=simple.myBytes.Length;
+                elementcount=simple.myBytes.Length;  // assumes elementcount=columncount.
+
                 // get unique value via Native API
                 seqno = (long)iris.ClassMethodLong("Solution.RAWDATA", "GETNEWID");
 
-                //Split received array into rows.
-                for (int i = 0; i < elementcount; i += columncount)
-                {
-                    list.Clear();
-                    for (int j = 0; j < columncount; j++) {
-                        if ((i+j+1)==elementcount) { break; };
-                        list.Add(simple.myBytes[i+j]);
-                    }
-                    iris.ClassMethodStatusCode("Solution.RAWDATA", "INSERT", seqno, list);
-                }
+                long? rowid = iris.ClassMethodLong("Solution.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",simple.myBytes)+"]","["+String.Join(",",simple.myArray)+"]");
 
-                newrequest = (IRISObject)iris.ClassMethodObject("Solution.RAWDATAC", "%New", seqno);
+                newrequest = (IRISObject)iris.ClassMethodObject("Solution.RAWDATA", "%OpenId", rowid);
 
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
