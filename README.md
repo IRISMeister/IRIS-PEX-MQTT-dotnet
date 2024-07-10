@@ -31,9 +31,9 @@ $ docker compose down
 |From_MQTT_EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨||
 |From_MQTT_PEX([dc.MQTTService](netgw/mylib1/MQTTService.cs))|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|Solution.RAWDATA|
 |From_MQTT_PEX2([dc.MQTTService2](netgw/mylib1/MQTTService2.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|PEX.Message|
-|From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|Solution.SimpleClass|
+|From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|MQTT.SimpleClass|
 |From_MQTT_PEX4(未実装)|Process_MQTT|PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例||
-|From_MQTT_PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|Solution.SimpleClass|
+|From_MQTT_PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|MQTT.SimpleClass|
 
 # データの送信方法
 ## 送信する
@@ -63,13 +63,17 @@ $ docker compose exec iris mosquitto_sub -v -h "mqttbroker" -p 1883 -t /ID_123/X
 
 ## IRIS側のデータ
 
+PEX3実行後のデータ。
 
 ```
+$ docker compose exec iris iris sql iris -UINTEROP
+
 SELECT ID,b.bytes
-  FROM Solution.SimpleClass as s,
+  FROM MQTT.SimpleClass as s,
        JSON_TABLE(s.myBytes, '$'
-         COLUMNS (bytes BINARY path '$.')
+         COLUMNS (bytes BINARY path '*')
        ) as b
+  WHERE ID=1
 
 | ID | bytes |
 | -- | -- |
@@ -81,22 +85,15 @@ SELECT ID,b.bytes
 | 1 | 6 |
 | 1 | 7 |
 | 1 | 8 |
-| 2 | 17 |
-| 2 | 18 |
-| 2 | 19 |
-| 2 | 20 |
-| 2 | 21 |
-| 2 | 22 |
-| 2 | 23 |
-| 2 | 24 |
 
-SELECT ID,b.bytes
-  FROM Solution.SimpleClass as s,
+SELECT ID,a.longs
+  FROM MQTT.SimpleClass as s,
        JSON_TABLE(s.myArray, '$'
-         COLUMNS (bytes BINARY path '$.')
-       ) as b
+         COLUMNS (longs INTEGER path '*')
+       ) as a
+  WHERE ID=1
 
-| ID | bytes |
+| ID | longs |
 | -- | -- |
 | 1 | 1 |
 | 1 | 2 |
@@ -106,20 +103,34 @@ SELECT ID,b.bytes
 | 1 | 6 |
 | 1 | 7 |
 | 1 | 8 |
-| 2 | 11 |
-| 2 | 12 |
-| 2 | 13 |
-| 2 | 14 |
-| 2 | 15 |
-| 2 | 16 |
-| 2 | 17 |
-| 2 | 18 |
+
+SELECT s.ID,b.bytes,a.longs
+  FROM MQTT.SimpleClass as s,
+       JSON_TABLE(s.myBytes, '$'
+         COLUMNS (bytes BINARY path '*')
+       ) as b,
+       JSON_TABLE(s.myArray, '$'
+         COLUMNS (longs INTEGER path '*')
+       ) as a
+       where ID=1
+
+64行返ってくる(直積)。8行であってほしい。
+
+
+SELECT * FROM MQTT.SimpleClass as s
+| ID | myArray | myBool | myBytes | myDouble | myFloat | myInt | myLong | myString | seq | topic |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| 1 | [1,2,3,4,5,6,7,8] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 1 | /ID_123/XGH/EKG/PEX3 |
+| 2 | [11,12,13,14,15,16,17,18] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 2 | /ID_123/XGH/EKG/PEX3 |
+| 3 | [100,200,300,400,500,600,700,800] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 3 | /ID_123/XGH/EKG/PEX3 |
+| 4 | [900,1000,1100,1200,1300,1400,1500,1600] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 4 | /ID_123/XGH/EKG/PEX3 |
+
 ```
 
 > 文字列化した配列から値を取り出良い方法が2024.1まで無かった。
 
 
-## 送信用の(バイナリ)ファイルを作成する
+## 送信用の(バイナリ)ファイルをエンコードする
 バイナリファイルを下記で作成します。  
 [BinaryEncoder.py](datavol/share/BinaryEncoder.py)はintの[配列](datavol/share/BinaryEncoder.avsc)がavroエンコードされたファイルを作成します。  
 [SimpleClass-encoder.py](datavol/share/SimpleClass-encoder.py)は[record](datavol/share/SimpleClass.avsc)がavroエンコードされたファイルを作成します。  
@@ -129,10 +140,14 @@ SELECT ID,b.bytes
 $ docker compose exec python bash
 root@d20238018cbc:~# cd share/
 root@d20238018cbc:~/share# python BinaryEncoder.py
-root@d20238018cbc:~/share# python SimpleClass-encoder.py
+root@d20238018cbc:~/share# python SimpleClassEncoder.py
 root@d20238018cbc:~/share# python testdata.py
 ```
 
+> 送信用の(バイナリ)ファイルをデコードする方法
+```
+root@d20238018cbc:~/share# python SimpleClassDecoder.py
+```
 
 # その他
 
@@ -255,11 +270,15 @@ root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
 ```
 
+## cs用のクラスの生成
+
 [Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成。(dotnet60-dev使用時のみ可能)
 ```
 root@80352f0c46d2:~# avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
 ```
-(参考) https://engineering.chrobinson.com/dotnet-avro/guides/cli-generate/
+(参考) https://github.com/apache/avro.git
+
+[そのまま](netgw/SimpleClass.cs)で実行する方法が分からなかったので、[加工](netgw/mylib1/SimpleClass.cs)してある。
 
 ## 参考にしたコードサンプル
 https://github.com/intersystems/Samples-PEX-Course

@@ -1,6 +1,6 @@
 /// Production response class. Target of data transformation
 /// that converts from MQTT topic and payload into a persistent object.
-Class Solution.MQTTDATA Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
+Class MQTT.MQTTDATA Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
 {
 
 Property topic As %String;

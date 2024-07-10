@@ -1,6 +1,6 @@
 /// Production response class. Target of data transformation
 /// that converts from MQTT topic and payload into a persistent object.
-Class Solution.RAWDATA Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
+Class MQTT.RAWDATA Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
 {
 
 Property seq As %BigInt;
@@ -58,12 +58,12 @@ Index idxseq On seq;
 
 ClassMethod INSERT(seq, topic,bytes,longarray) As %Status
 {
-#define COLCOUNT 8
-    For i=1:1:$$$COLCOUNT { Set b(i)=0, l(i)=0 }
+#define DATAPOINTNUM 8
+    For i=1:1:$$$DATAPOINTNUM { Set b(i)=0, l(i)=0 }
 
     Set json=[].%FromJSON(bytes)
     Set jsonlong=[].%FromJSON(longarray)
-    For i=1:1:$$$COLCOUNT { Set b(i)=json.%Get(i-1), l(i)=jsonlong.%Get(i-1) }
+    For i=1:1:$$$DATAPOINTNUM { Set b(i)=json.%Get(i-1), l(i)=jsonlong.%Get(i-1) }
 
     &SQL(INSERT INTO RAWDATA (seq, topic, b1,b2,b3,b4,b5,b6,b7,b8,l1,l2,l3,l4,l5,l6,l7,l8) VALUES (:seq, :topic, :b(1),:b(2),:b(3),:b(4),:b(5),:b(6),:b(7),:b(8), :l(1), :l(2), :l(3), :l(4), :l(5), :l(6), :l(7), :l(8)))
 

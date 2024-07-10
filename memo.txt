@@ -1,0 +1,60 @@
+(XEPを使いたかったので)自前作成のSimpleClass.csを使っていたが、XEPの線が消えたので、avrogenで生成されたcsを使用するように修正中。
+(そもそも使用していなかったが)mapがうまく動作しない点を除けば動作している。
+
+クラスは下記要領で作成し、netgw/mylib1/SimpleClass.csに配置する。
+$ docker compose exec dotnet-dev bash
+dotnet tool install --global Apache.Avro.Tools --version 1.11.3
+export PATH="$PATH:/root/.dotnet/tools"
+avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:dc
+
+netgw/genavro/Program.csの実行
+docker compose exec netgw /app/genavro
+
+netgw/myapp/Program.csの実行
+docker compose exec netgw /app/myapp
+
+
+
+
+CREATE TABLE Senators ( person VARCHAR(1000),
+                        extra VARCHAR (1000),
+                        state VARCHAR(2) )
+
+INSERT INTO Senators ( person, extra, state ) 
+SELECT person,extra, state
+    FROM JSON_TABLE(%Net.GetJson('https://www.govtrack.us/api/v2/role?current=true&role_type=senator','{"SSLConfiguration":"ISC.FeatureTracker.SSL.Config"}'),
+  '$.content.objects'
+      COLUMNS ( person VARCHAR(100) PATH '$.person',
+                extra VARCHAR(100) PATH '$.extra',
+                state VARCHAR(50) PATH '$.state'
+      )
+    )
+
+SELECT jtp.name, state, jtp.birth_date, jte.address
+  FROM Senators as Sen,
+       JSON_TABLE(Sen.person, '$'
+         COLUMNS ( name VARCHAR(60) path '$.sortname',
+                   birth_date VARCHAR(10) path '$.birthday'
+         )
+       ) as jtp,
+       JSON_TABLE(Sen.extra, '$'
+         COLUMNS ( address VARCHAR(100) path '$.address' )
+       ) as jte
+       
+100行 <== なぜ100*100行にならない？ Literal Joinだから？
+
+SELECT jtp.name, state, jtp.birth_date
+  FROM Senators as Sen,
+       JSON_TABLE(Sen.person, '$'
+         COLUMNS ( name VARCHAR(60) path '$.sortname',
+                   birth_date VARCHAR(10) path '$.birthday'
+         )
+       ) as jtp
+100行
+
+SELECT state,  jte.address
+  FROM Senators as Sen,
+       JSON_TABLE(Sen.extra, '$'
+         COLUMNS ( address VARCHAR(100) path '$.address' )
+       ) as jte
+100行

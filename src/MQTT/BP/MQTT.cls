@@ -1,5 +1,5 @@
 /// 
-Class Solution.BP.MQTT Extends Ens.BusinessProcessBPL
+Class MQTT.BP.MQTT Extends Ens.BusinessProcessBPL
 {
 
 /// BPL Definition

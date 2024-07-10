@@ -9,7 +9,7 @@ XData MyInstall [ XMLNamespace = INSTALLER ]
   <Default Name="APPPATH" Dir="/opt/irisbuild" />
   <Default Name="SOURCESPATH" Dir="${APPPATH}src" />
   <Default Name="RESOURCE" Value="%DB_${DBNAME}" /> 
-  <Default Name="ProductionName" Value="Solution.MQTT"/>
+  <Default Name="ProductionName" Value="MQTT.Production"/>
 
   <Namespace Name="${NAMESPACE}" Code="${DBNAME}-CODE" Data="${DBNAME}-DATA" Create="yes" Ensemble="1">
     <Configuration>

@@ -30,7 +30,7 @@ namespace dc
             byte[] b = req.GetBytes("StringValue");
             List<dc.SimpleClass> items = dc.ReflectReader.decode<dc.SimpleClass>(b);
 
-            const int columncount = 8;  // Number of columns (p1,p2,p3,p4...) Solution.RAWDATA has
+            const int columncount = 8;  // Number of columns (p1,p2,p3,p4...) MQTT.RAWDATA has
             IRIS iris = GatewayContext.GetIRIS();
             IRISObject newrequest;
             int elementcount;  
@@ -39,11 +39,11 @@ namespace dc
                 elementcount=simple.myBytes.Length;  // assumes elementcount=columncount.
 
                 // get unique value via Native API
-                seqno = (long)iris.ClassMethodLong("Solution.RAWDATA", "GETNEWID");
+                seqno = (long)iris.ClassMethodLong("MQTT.RAWDATA", "GETNEWID");
 
-                long? rowid = iris.ClassMethodLong("Solution.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",simple.myBytes)+"]","["+String.Join(",",simple.myArray)+"]");
+                long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",simple.myBytes)+"]","["+String.Join(",",simple.myArray)+"]");
 
-                newrequest = (IRISObject)iris.ClassMethodObject("Solution.RAWDATA", "%OpenId", rowid);
+                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.RAWDATA", "%OpenId", rowid);
 
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');

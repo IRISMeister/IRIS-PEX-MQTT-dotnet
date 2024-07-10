@@ -48,7 +48,7 @@ namespace dc
                 // Use myLong as an unique key. 
                 seqno = simple.myLong;
                 // Save a container message into IRIS via Native API
-                newrequest = (IRISObject)iris.ClassMethodObject("Solution.SimpleClassC", "%New", topic,seqno);
+                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClassC", "%New", topic,seqno);
                 
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');

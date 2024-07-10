@@ -51,10 +51,26 @@ namespace dc
             r=ReflectReader.protocol<ComplexClass>(schema, z);
             Console.WriteLine(((ComplexClass)r).myString);
 
+            /*
             schema=SimpleClass.SCHEMA;
             SimpleClass s= SimpleClass.Populate();
             r=ReflectReader.schema<SimpleClass>(schema, s);
             Console.WriteLine(((SimpleClass)r).myString);
+            */
+            SimpleClass s = new SimpleClass()
+            {
+                myInt = 1,
+                myLong = 2L,
+                myBool = true,
+                myDouble = 3.14,
+                myFloat = (float)1.59E-2,
+                myBytes = new byte[3] { 0x01, 0x02, 0x03 },
+                myString = "def",
+                myArray = new long[3] { 1, 2, 3 }
+            };
+            Avro.Schema schema2 =SimpleClass._SCHEMA;
+            var r2 = ReflectReader.schema2<SimpleClass>(schema2, s);
+            Console.WriteLine("myInt:" + ((SimpleClass)r2).myInt);
 
         }
 

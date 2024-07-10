@@ -67,7 +67,24 @@ namespace dc
         T output = deserialize<T>(stream, ws, ws);
         return output;
     }
+    public static T schema2<T>(Avro.Schema s, T value)
+    {
+        Stream stream;
+        Avro.Schema ws;
+        serializeBySchema2<T>(s, value, out stream, out ws);
 
+        // save to a file.
+        string path = "SimpleClass.avro";
+        FileStream fs = new FileStream(
+            path, FileMode.Create, FileAccess.Write);
+        stream.CopyTo(fs);
+        fs.Close();
+        stream.Position = 0;
+
+
+        T output = deserialize<T>(stream, ws, ws);
+        return output;
+    }
     public static void serializeBySchema<T>(string writerSchema, T actual, out Stream stream, out Avro.Schema ws)
     {
 
@@ -83,6 +100,22 @@ namespace dc
         ms.Position = 0;
         stream = ms;
     }
+    public static void serializeBySchema2<T>(Avro.Schema writerSchema, T actual, out Stream stream, out Avro.Schema ws)
+    {
+
+        ws = writerSchema;
+
+        var ms = new MemoryStream();
+        Encoder e = new BinaryEncoder(ms);
+
+        ReflectWriter<T> w = new ReflectWriter<T>(ws);
+
+        w.Write(actual, e);
+        ms.Flush();
+        ms.Position = 0;
+        stream = ms;
+    }
+
 
     public static void serializeByProtocol<T>(string writerSchema, T actual, out Stream stream, out Avro.Schema ws)
     {
@@ -114,9 +147,13 @@ namespace dc
             ms.Write(b, 0, b.Length);
             ms.Position = 0;
 
+/*
             System.Reflection.FieldInfo field = typeof(S).GetField("SCHEMA");
             string schema=(string)field.GetValue(null);
             Avro.Schema ws = Schema.Parse(schema);
+*/
+            System.Reflection.FieldInfo field = typeof(S).GetField("_SCHEMA");
+            Avro.Schema ws=(Avro.Schema)field.GetValue(null);
             ReflectReader<S> r = new ReflectReader<S>(ws, ws);
             Decoder d = new BinaryDecoder(ms);
 

@@ -35,7 +35,7 @@ namespace dc
             foreach (dc.SimpleClass simple in items)
             {
                 // get unique value via Native API
-                seqno = (long)iris.ClassMethodLong("Solution.MQTTDATA", "GETNEWID");
+                seqno = (long)iris.ClassMethodLong("MQTT.MQTTDATA", "GETNEWID");
                 // Pass an array as a comma separated String value.
                 newrequest = new MQTTRequest(topic,seqno,String.Join(",",simple.myBytes));
                 // Iterate through target business components and send request message

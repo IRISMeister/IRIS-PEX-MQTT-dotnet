@@ -1,4 +1,4 @@
-Class Solution.SimpleClassC Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
+Class MQTT.SimpleClassC Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
 {
 
 Property topic As %String;

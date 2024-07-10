@@ -1,4 +1,4 @@
-Class Solution.RAWDATAC Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
+Class MQTT.RAWDATAC Extends (%Persistent, %XML.Adaptor, Ens.Util.RequestBodyMethods)
 {
 
 Property seq As %BigInt;
