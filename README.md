@@ -26,14 +26,15 @@ $ docker compose down
 
 # MQTT受信用のビジネスサービスについて
 
-|BS|送信先|備考|格納先テーブル|
-|:--|:--|:--|:--|
-|From_MQTT_EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨||
-|From_MQTT_PEX([dc.MQTTService](netgw/mylib1/MQTTService.cs))|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|Solution.RAWDATA|
-|From_MQTT_PEX2([dc.MQTTService2](netgw/mylib1/MQTTService2.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|PEX.Message|
-|From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|MQTT.SimpleClass|
-|From_MQTT_PEX4(未実装)|Process_MQTT|PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例||
-|From_MQTT_PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|MQTT.SimpleClass|
+|BS|Topic|送信先|備考|格納先テーブル|
+|:--|:--|:--|:--|:--|
+|From_MQTT_EXT|EXT|Process_MQTT|External Languageを明示使用する例。下記PEX利用を推奨||
+|From_MQTT_PEX([dc.MQTTService](netgw/mylib1/MQTTService.cs))|PEX|Process_MQTT|PEX使用。myBytes配列を分割して、リレーショナル化する例|Solution.RAWDATA|
+|From_MQTT_PEX2([dc.MQTTService2](netgw/mylib1/MQTTService2.cs))|PEX2|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[PEXメッセージ](dotnet/mylib1/MQTTRequest.cs)で作成する例|PEX.Message|
+|From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|PEX3|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|MQTT.SimpleClass|
+|~~From_MQTT_PEX4~~|~~PEX4~~|~~Process_MQTT~~|~~PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例~~||
+|From_MQTT_PT|PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|MQTT.SimpleClass|
+|MQTT.BS.PYTHON([MQTT.BS.PYTHON](src\MQTT\BS\PYTHON.cls))|PY|N/A|埋め込みPython使用例|MQTT.SimpleClass|
 
 # データの送信方法
 ## 送信する

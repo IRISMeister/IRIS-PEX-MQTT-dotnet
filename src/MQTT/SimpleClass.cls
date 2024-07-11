@@ -19,8 +19,6 @@ Property myBytes As %Library.RawString;
 
 Property myString As %Library.String;
 
-// a list of binary array
-//Property myArray As list Of %Library.RawString(STORAGEDEFAULT = "list");
 Property myArray As %Library.RawString;
 
 Index idxseq On seq;
@@ -37,12 +35,6 @@ Method %OnNew(topic As %String, seq As %BigInt, myInt As %Integer, myLong As %Bi
     Set ..myBytes=myBytes    
     Set ..myString=myString
     Set ..myArray=myArray
-    /*
-    Set myArrayCount=$LISTLENGTH(myArray)
-    For i=1:1:myArrayCount {
-        Do ..myArray.Insert($LIST(myArray,i))
-    }
-    */
     Return $$$OK
 }
 

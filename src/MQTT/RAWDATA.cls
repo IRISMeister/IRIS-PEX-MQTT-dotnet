@@ -19,9 +19,6 @@ Property myFloat As %Library.Float;
 
 Property myString As %Library.String;
 
-// a list of binary array
-//Property myArray As list Of %Library.RawString(STORAGEDEFAULT = "list");
-
 Property b1 As %Integer;
 
 Property b2 As %Integer;
