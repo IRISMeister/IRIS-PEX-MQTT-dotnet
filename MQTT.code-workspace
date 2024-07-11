@@ -24,7 +24,8 @@
         },
         "objectscript.conn.password": "demo",
         "objectscript.conn.docker-compose.service": "iris",
-        "objectscript.conn.active": true
+        "objectscript.conn.active": true,
+        "dotnet.defaultSolution": "disable"
         
     },
     "objectscript.conn.docker-compose": {}

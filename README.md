@@ -38,7 +38,7 @@ $ docker compose down
 # データの送信方法
 ## 送信する
 ```
-# docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
+# docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
 ```
 上記コマンドを実行すると、From_MQTT_PTがMQTTメッセージを受信し、その後の処理が実行されます。
 
@@ -54,11 +54,11 @@ $ docker compose down
 
 下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
 ```
-$ docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
+$ docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
 ```
 必要に応じてサブスクライブ出来ます。
 ```
-$ docker compose exec iris mosquitto_sub -v -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PT/#
+$ docker compose exec iris mosquitto_sub -v -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT/#
 ```
 
 ## IRIS側のデータ

@@ -65,6 +65,11 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
   </Item>
+  <Item Name="MQTT.BS.PYTHON" Category="" ClassName="MQTT.BS.PYTHON" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
+    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PY/#</Setting>
+    <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+  </Item>
 </Production>
 }
 

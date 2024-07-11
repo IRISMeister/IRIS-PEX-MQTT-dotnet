@@ -2,7 +2,7 @@ import io,os
 import avro.schema
 import avro.io
 
-schema = avro.schema.parse(open("SimpleClass.avsc", "rb").read())
+schema = avro.schema.parse(open('SimpleClass.avsc', 'rb').read())
 
 fd = os.open('SimpleClass.avro', os.O_RDONLY)
 BUFSIZE = 2**32-1
