@@ -9,7 +9,7 @@ MQTTについて
 多言語対応
 
 IRISについて
-多言語対応
+サーバサイドでのロジック記述に使用できる言語(c#, java, python, c/c++, ObjectScript)
 
 つまり、組み合わせは自在
 
@@ -25,24 +25,41 @@ IRISについて
 c#のメリットは、AVROの定義からc#クラスを生成してくれるツールが存在すること。入力支援が有効。
 Pythonのメリットは、ダイナミックであること。埋め込みPythonが使えること。
 
+派生例としては、BSで受信後デコードせずに、ただちに保存(GlobalあるいはO/Sファイル)だけする。別のBSでデコード->INSERTする。
+この際、FIFOを考慮したデコード処理の並列化を検討すべき。
+「インターオペラビリティ機能のビジネスプロセスを理解する」のFIFOについてのくだりを参照ください。
+https://www.youtube.com/watch?v=RUxeT4cTy4k
+
 javaの例
 https://github.com/intersystems-community/irisdemo-demo-kafka
 かなりボリュームがある。Spring Framework使用の本格的なjavaサーバを使用。
 
 
-Windowsでの飛ばし方
-"\Program Files"\mosquitto\mosquitto_pub -h localhost -p 1883 -t /ID_123/XGH/EKG/PY -f C:\git\IRIS-PEX-MQTT-dotnet\datavol\share\SimpleClass.avro
 
-
-# いろいろ
+# いろいろハマったところ
 ## python
 - 埋め込みpythonのpyの配置場所
-- バイナリの渡し方
+- バイナリの扱い方
+Python内でのファイル操作時のbinaryモード使用
+IRIS->Python
 - __main__の勧め(デバッグしやすい)
+
+情報元として「ObjectScript と組み込み Python 間のギャップを埋める」が有益です。
+https://docs.intersystems.com/supplychain20241/csp/docbookj/DocBook.UI.Page.cls?KEY=GEPYTHON_sharedata
 
 ## Production
 
 BSだけのProductionもOK。大量レコードの処理時にはメッセージは不向き。1000件/秒で発生するようなメッセージをメッセージビューワで閲覧、目検でデバッグするのは非現実的。
+
+
+Windowsでの実行
+
+```
+mqtt server
+"\Program Files"\mosquitto\mosquitto -v
+mqtt client
+"\Program Files"\mosquitto\mosquitto_pub -h localhost -p 1883 -t /ID_123/XGH/EKG/PY -f C:\git\IRIS-PEX-MQTT-dotnet\datavol\share\SimpleClass.avro
+```
 
 
 ```

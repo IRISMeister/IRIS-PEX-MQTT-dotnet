@@ -4,15 +4,16 @@ import avro.io
 
 schema = avro.schema.parse(open('SimpleClass.avsc', 'rb').read())
 
-fd = os.open('SimpleClass.avro', os.O_RDONLY)
-BUFSIZE = 2**32-1
-byte_data = os.read(fd, BUFSIZE)
-os.close(fd)
+fr = open('SimpleClass.avro', 'rb')
+byte_data = fr.read()
+print(byte_data)
 
 bytes_reader = io.BytesIO(byte_data)
 decoder = avro.io.BinaryDecoder(bytes_reader)
 reader = avro.io.DatumReader(schema)
+print(len(bytes_reader.getvalue()))
 
 while bytes_reader.tell() < len(bytes_reader.getvalue()):
     data = reader.read(decoder)
     print(data)
+    bytes_reader.tell()

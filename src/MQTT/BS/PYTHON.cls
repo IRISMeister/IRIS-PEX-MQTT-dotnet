@@ -8,9 +8,10 @@ Method OnProcessInput(pInput As EnsLib.MQTT.Message, pOutput As %RegisteredObjec
 	#dim e As %Exception.AbstractException
 	
 	Try {
-		$$$LOGINFO("Topic:"_pInput.Topic_" Value:"_pInput.StringValue)
-		Set ^log($INCREMENT(^log))=pInput.StringValue
-		Set seq=^log
+		#; $$$LOGINFO("Topic:"_pInput.Topic_" Value:"_pInput.StringValue)
+		#; Set ^log($INCREMENT(^log))=pInput.StringValue
+
+		Set seq=$INCREMENT(^seq)
 		#; Avroはバイナリ形式なので、(文字列ではなく)バイト列として渡す。
 		Set tSC=..SaveAvro(seq,pInput.Topic,##class(%SYS.Python).Bytes(pInput.StringValue))
 
