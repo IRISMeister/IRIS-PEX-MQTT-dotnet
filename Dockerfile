@@ -17,6 +17,8 @@ RUN mkdir /opt/irisbuild && chown irisowner:irisowner /opt/irisbuild
 WORKDIR /opt/irisbuild
 
 USER irisowner
+RUN pip install avro -t /usr/irissys/mgr/python
+
 COPY ./src ./src/
 COPY ./Installer.cls ./
 COPY iris.script iris.script
@@ -25,4 +27,5 @@ RUN iris start IRIS \
 	&& iris session IRIS < iris.script \
     && iris stop IRIS quietly
 
-#COPY ./c-src /home/irisowner/c-src
+COPY datavol/share/saveAvro2IRIS.py /usr/irissys/mgr/python/
+COPY datavol/share/SimpleClass.avsc /opt/irisbuild/AVRO/

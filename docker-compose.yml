@@ -5,8 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 51873:1972         
-      - 8888:52773         
+      - 8882:52773         
     environment:
       - TZ=JST-9
     volumes:

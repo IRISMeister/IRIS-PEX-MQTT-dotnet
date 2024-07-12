@@ -10,7 +10,7 @@ def save(seq,topic,avromsg):
 	#print(iris.cls('%SYSTEM.Version').GetVersion())
 	#print(avromsg)
 
-	schema = avro.schema.parse(open('C:\git\IRIS-PEX-MQTT-dotnet\datavol\share\SimpleClass.avsc', 'rb').read())
+	schema = avro.schema.parse(open('SimpleClass.avsc', 'rb').read())
 	#print(schema)
 
 	bytes_reader = io.BytesIO(avromsg)
