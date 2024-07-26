@@ -1,4 +1,4 @@
-例えば、どういうことをしたいのかの全貌。
+## 例えば、どういうことをしたいのかの全貌。
 
 PEX(C#)は参考程度に。主はpython。
 
@@ -7,10 +7,10 @@ wikipedia,
 https://github.com/intersystems-community/irisdemo-demo-kafka How does the Demo uses AVRO and AVRO Schemas
 多言語対応
 
-MQTTについて
+## MQTTについて
 多言語対応
 
-IRISについて
+## IRISについて
 サーバサイドでのロジック記述に使用できる言語(c#, java, python, c/c++, ObjectScript)
 
 つまり、組み合わせは自在
@@ -22,9 +22,12 @@ IRISについて
 |IRIS| c#/Java(PEX) | IRIS上で実行 | AVROデコードのみc#/Javaで実行する方法|処理が冗長な分オーバヘッドが大きい|
 |IRIS| Python(埋め込み) | IRIS上で実行 | 簡潔 |
 
+## 今回はc# と Pythonを選択
 
-今回はc# と Pythonを選択
-c#のメリットは、AVROの定義からc#クラスを生成してくれるツールが存在すること。入力支援が有効。
+理由：c#は、あまりサンプルが無いから。pythonはあまりに簡潔に実現できるから。さらに
+
+c#のメリットは、AVROの定義からc#クラスを生成してくれるツールが存在すること。入力支援が有効になる。
+
 Pythonのメリットは、ダイナミックであること。埋め込みPythonが使えること。
 
 派生例としては、BSで受信後デコードせずに、ただちに保存(GlobalあるいはO/Sファイル)だけする。別のBSでデコード->INSERTする。
