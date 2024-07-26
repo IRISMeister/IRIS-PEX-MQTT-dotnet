@@ -21,7 +21,7 @@ namespace dc
             LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
 
             String value = req.GetString("StringValue");
-            LOGINFO("Received StringValue: " + value);
+            //LOGINFO("Received StringValue: " + value);
 
             String topic = req.GetString("Topic");
             LOGINFO("Received topic: " + topic);
@@ -30,29 +30,31 @@ namespace dc
             byte[] b = req.GetBytes("StringValue");
             List<dc.SimpleClass> items = dc.ReflectReader.decode<dc.SimpleClass>(b);
 
-            const int columncount = 8;  // Number of columns (p1,p2,p3,p4...) MQTT.RAWDATA has
             IRIS iris = GatewayContext.GetIRIS();
-            IRISObject newrequest;
-            int elementcount;  
-            foreach (dc.SimpleClass simple in items)
+            IRISObject newobject,newrequest;
+
+            seqno=iris.Increment(1,"seq");
+            foreach (dc.SimpleClass item in items)
             {
-                elementcount=simple.myBytes.Length;  // assumes elementcount=columncount.
 
-                // get unique value via Native API
-                seqno = (long)iris.ClassMethodLong("MQTT.RAWDATA", "GETNEWID");
-
-                long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",simple.myBytes)+"]","["+String.Join(",",simple.myArray)+"]");
-
-                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.RAWDATA", "%OpenId", rowid);
-
-                // Iterate through target business components and send request message
-                string[] targetNames = TargetConfigNames.Split(',');
-                foreach (string name in targetNames)
+                // Save bytes as a O/S file
+                using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
                 {
-                    LOGINFO("Target:" + name);
-                    SendRequestAsync(name, newrequest);
-                }
+                    fs.Write(item.myBytes, 0, item.myBytes.Length);
+                }                
+
+                long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, item.myFilename,"["+String.Join(",",item.myArray)+"]");
             }
+
+            newrequest = (IRISObject)iris.ClassMethodObject("MQTT.REQ.Simple", "%New", seqno,topic);
+            // Iterate through target business components and send request message
+            string[] targetNames = TargetConfigNames.Split(',');
+            foreach (string name in targetNames)
+            {
+                LOGINFO("Target:" + name);
+                SendRequestAsync(name, newrequest);
+            }
+            
             return null;
         }
 

@@ -21,7 +21,7 @@ public class Class1
                     String port = "1972";
                     String username = "SuperUser";
                     String password = "SYS";
-                    String Namespace = "INTEROP";
+                    String Namespace = "AVRO";
                     IRISConnection connection = new IRISConnection();
                     connection.ConnectionString = "Server = " + host + "; Port = " + port + "; Namespace = " + Namespace + "; Password = " + password + "; User ID = " + username;
                     connection.Open();

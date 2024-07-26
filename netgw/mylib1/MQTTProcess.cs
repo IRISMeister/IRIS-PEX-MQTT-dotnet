@@ -31,15 +31,14 @@ namespace dc
 
             long seqno;
 
-            LOGINFO("Message Received");
             IRISObject req = (IRISObject)request;
-            LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
+            //LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
 
             String value = req.GetString("StringValue");
-            LOGINFO("Received StringValue: " + value);
+            //LOGINFO("Received StringValue: " + value);
 
             String topic = req.GetString("Topic");
-            LOGINFO("Received topic: " + topic);
+            //LOGINFO("Received topic: " + topic);
 
             // Decode AVRO
             byte[] b = req.GetBytes("StringValue");
@@ -52,7 +51,7 @@ namespace dc
                 // get unique value via Native API
                 seqno = (long)iris.ClassMethodLong("MQTT.SimpleClass", "GETNEWID");
                 // Pass an array as a comma separated String value.
-                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,"["+String.Join(",",simple.myBytes)+"]",simple.myString,"["+String.Join(",",simple.myArray)+"]");
+                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,simple.myFilename,simple.myString,"["+String.Join(",",simple.myArray)+"]");
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
                 foreach (string name in targetNames)

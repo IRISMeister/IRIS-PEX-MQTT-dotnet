@@ -65,6 +65,7 @@ namespace dc
                 myDouble = 3.14,
                 myFloat = (float)1.59E-2,
                 myBytes = new byte[3] { 0x01, 0x02, 0x03 },
+                myFilename = "filename.png",
                 myString = "def",
                 myArray = new long[3] { 1, 2, 3 }
             };

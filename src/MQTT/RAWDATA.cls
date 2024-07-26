@@ -19,21 +19,7 @@ Property myFloat As %Library.Float;
 
 Property myString As %Library.String;
 
-Property b1 As %Integer;
-
-Property b2 As %Integer;
-
-Property b3 As %Integer;
-
-Property b4 As %Integer;
-
-Property b5 As %Integer;
-
-Property b6 As %Integer;
-
-Property b7 As %Integer;
-
-Property b8 As %Integer;
+Property myFilename As %Library.String;
 
 Property l1 As %Integer;
 
@@ -53,16 +39,15 @@ Property l8 As %Integer;
 
 Index idxseq On seq;
 
-ClassMethod INSERT(seq, topic,bytes,longarray) As %Status
+ClassMethod INSERT(seq, topic,myFilename,longarray) As %Status
 {
 #define DATAPOINTNUM 8
     For i=1:1:$$$DATAPOINTNUM { Set b(i)=0, l(i)=0 }
 
-    Set json=[].%FromJSON(bytes)
     Set jsonlong=[].%FromJSON(longarray)
-    For i=1:1:$$$DATAPOINTNUM { Set b(i)=json.%Get(i-1), l(i)=jsonlong.%Get(i-1) }
+    For i=1:1:$$$DATAPOINTNUM { Set l(i)=jsonlong.%Get(i-1) }
 
-    &SQL(INSERT INTO RAWDATA (seq, topic, b1,b2,b3,b4,b5,b6,b7,b8,l1,l2,l3,l4,l5,l6,l7,l8) VALUES (:seq, :topic, :b(1),:b(2),:b(3),:b(4),:b(5),:b(6),:b(7),:b(8), :l(1), :l(2), :l(3), :l(4), :l(5), :l(6), :l(7), :l(8)))
+    &SQL(INSERT INTO RAWDATA (seq, topic, myFilename, l1,l2,l3,l4,l5,l6,l7,l8) VALUES (:seq, :topic, :myFilename, :l(1), :l(2), :l(3), :l(4), :l(5), :l(6), :l(7), :l(8)))
 
     Return %ROWID
     //Quit $$$OK

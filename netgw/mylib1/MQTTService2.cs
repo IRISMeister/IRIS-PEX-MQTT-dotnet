@@ -21,7 +21,7 @@ namespace dc
             LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
 
             String value = req.GetString("StringValue");
-            LOGINFO("Received StringValue: " + value);
+            //LOGINFO("Received StringValue: " + value);
 
             String topic = req.GetString("Topic");
             LOGINFO("Received topic: " + topic);
@@ -32,12 +32,18 @@ namespace dc
 
             IRIS iris = GatewayContext.GetIRIS();
             MQTTRequest newrequest;
-            foreach (dc.SimpleClass simple in items)
+            seqno=iris.Increment(1,"seq");
+            foreach (dc.SimpleClass item in items)
             {
-                // get unique value via Native API
-                seqno = (long)iris.ClassMethodLong("MQTT.MQTTDATA", "GETNEWID");
+
+                // Save bytes as a O/S file
+                using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    fs.Write(item.myBytes, 0, item.myBytes.Length);
+                }                
+
                 // Pass an array as a comma separated String value.
-                newrequest = new MQTTRequest(topic,seqno,String.Join(",",simple.myBytes));
+                newrequest = new MQTTRequest(topic,seqno,item.myFilename,String.Join(",",item.myArray));
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
                 foreach (string name in targetNames)

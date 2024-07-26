@@ -10,6 +10,7 @@
          { "name" : "myDouble", "type" : "double" },
          { "name" : "myFloat", "type" : "float" },
          { "name" : "myBytes", "type" : "bytes" },
+         { "name" : "myFilename", "type" : "string" },
          { "name" : "myString", "type" : "string" },
          { "name" : "myArray", "type" : { "type" : "array", "items" : "long" } }
    ]

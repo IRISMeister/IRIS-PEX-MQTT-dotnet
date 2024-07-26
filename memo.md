@@ -1,5 +1,7 @@
 例えば、どういうことをしたいのかの全貌。
 
+PEX(C#)は参考程度に。主はpython。
+
 AVROとは
 wikipedia, 
 https://github.com/intersystems-community/irisdemo-demo-kafka How does the Demo uses AVRO and AVRO Schemas
@@ -34,18 +36,133 @@ javaの例
 https://github.com/intersystems-community/irisdemo-demo-kafka
 かなりボリュームがある。Spring Framework使用の本格的なjavaサーバを使用。
 
+# AVRO vs JSON
 
+AVRO
+
+サイズがより小さい、スキーマを定義できる、データ型が豊富、マシンリーダブル。
+
+
+
+JSON
+
+スキーマレス(変更に強い)、データ型は文字と数値、ヒューマンリーダブル。
+
+
+特定の用途への向き不向きは、これらの性質により決まる。
+
+AVROは、もともとHadoopのデータ保存形式なので、Hadoop/Spark由来のDBMS製品では自然に読み書きができる。
+
+印象ですが
+
+固定的なフォーマットだが、大量にデータが発生する、IoT系(センサーデータ)や金融等はAVRO。 
+
+非常に複雑なフォーマットになりがちな医療(診療)情報系はJSON(FHIR)。
+
+
+## サイズ
+
+どれくらい小さいか？
+
+```
+$ python3 CompareSize.py
+ 
+-rw-r--r-- 1 irismeister irismeister  2644  7月 26 12:25 compare.avro
+-rw-r--r-- 1 irismeister irismeister  4449  7月 26 12:25 compare.json
+```
+
+base64は24 bits(8 bits*3)を6 bits*4に変換するので、一番サイズが大きい要素であるバイト配列は1.3倍程度の大きさになる。
+
+long(64 bits=8 bytesの整数)も、数値が大きいとサイズの差が開く。下記の例だと19/8=2.4倍程度。
+>>> 2**60
+1152921504606846976 <== 19 bytes
+
+## 
+
+```
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY -f /home/irisowner/share/compare.avro
+あるいは下記で連続投入実施
+python3 Simple-Pub-AVRO.py
+```
+
+```
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY2 -f /home/irisowner/share/compare.json
+あるいは下記で連続投入実施
+python3 Simple-Pub-JSON.py
+```
+
+
+## スキーマを定義
+
+スキーマエボリューション対応。
+
+## データ型
+
+使用言語次第で、データの精度を維持できる。
+
+```
+>>> 0.1+0.2
+0.30000000000000004
+>>>
+```
+これで説明付くか？
+
+## マシンリーダブル
+
+jsonやxmlはマシンリーダブルかつヒューマンリーダブル。
 
 # いろいろハマったところ
+
+## どこが根を上げるか？
+
+あるデータタイプの配列が非常に大きい場合、どの程度のサイズまで処理できるか。
+> センサーデータなどを想定。
+
+MQTTのパケットサイズの上限: 268435455 Bytes = 256 MB
+```
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY -f /home/irisowner/share/400MB.avro
+Error: File must be less than 268435455 bytes.
+```
+
+AVROのサイズ上限
+
+詳細不明。MQTTのパケットサイズ上限以上なので、深入りせず。
+
+IRISの上限
+
+MQTTの受信データは全体がいったん EnsLib.MQTT.MessageのStringValueに保存されるので、恐らくこれが上限になる。
+
+> IRIS ローカル変数、戻り値の最大サイズ: 3,641,144 文字 (Ascii文字なら3.5MB程度)
+
+
+5.3MBのパケットを受信した場合、IRIS内でエラー発生。
+```
+ERROR #5002: ObjectScript error: <NULL VALUE>Receive+6 ^%Net.MQTT.Client.1
+```
+
+3.2MB程度のパケットは正常に受信可能。
+
+つまり、パケットサイズは3.5MB以下に抑えるのが安全。
+> 8バイトの浮動小数点換算で、45万データポイント。1秒に100回データ取得している場合でも、10秒間で8KBでしかないので十分？
+
+
+
 ## python
-- 埋め込みpythonのpyの配置場所
-- バイナリの扱い方
+### 埋め込みpythonのpyの配置場所
+### バイナリの扱い方
 Python内でのファイル操作時のbinaryモード使用
 IRIS->Python
-- __main__の勧め(デバッグしやすい)
+### __main__の勧め(デバッグしやすい)
 
 情報元として「ObjectScript と組み込み Python 間のギャップを埋める」が有益です。
 https://docs.intersystems.com/supplychain20241/csp/docbookj/DocBook.UI.Page.cls?KEY=GEPYTHON_sharedata
+
+### カレントディレクトリの場所(open()時に気づく)
+
+基本は、現在のネームスペースが使用するデータベースの位置。
+
+Python起点でのアクセス時の初期状態はUSERデータベースの位置 (正確にはユーザの「開始ネームスペース」の設定に紐づくデータベース)
+
 
 ## Production
 
@@ -80,48 +197,3 @@ docker compose exec netgw /app/myapp
 ```
 
 
-```
-
-CREATE TABLE Senators ( person VARCHAR(1000),
-                        extra VARCHAR (1000),
-                        state VARCHAR(2) )
-
-INSERT INTO Senators ( person, extra, state ) 
-SELECT person,extra, state
-    FROM JSON_TABLE(%Net.GetJson('https://www.govtrack.us/api/v2/role?current=true&role_type=senator','{"SSLConfiguration":"ISC.FeatureTracker.SSL.Config"}'),
-  '$.content.objects'
-      COLUMNS ( person VARCHAR(100) PATH '$.person',
-                extra VARCHAR(100) PATH '$.extra',
-                state VARCHAR(50) PATH '$.state'
-      )
-    )
-
-SELECT jtp.name, state, jtp.birth_date, jte.address
-  FROM Senators as Sen,
-       JSON_TABLE(Sen.person, '$'
-         COLUMNS ( name VARCHAR(60) path '$.sortname',
-                   birth_date VARCHAR(10) path '$.birthday'
-         )
-       ) as jtp,
-       JSON_TABLE(Sen.extra, '$'
-         COLUMNS ( address VARCHAR(100) path '$.address' )
-       ) as jte
-       
-100行 <== なぜ100*100行にならない？ Literal Joinだから？
-
-SELECT jtp.name, state, jtp.birth_date
-  FROM Senators as Sen,
-       JSON_TABLE(Sen.person, '$'
-         COLUMNS ( name VARCHAR(60) path '$.sortname',
-                   birth_date VARCHAR(10) path '$.birthday'
-         )
-       ) as jtp
-100行
-
-SELECT state,  jte.address
-  FROM Senators as Sen,
-       JSON_TABLE(Sen.extra, '$'
-         COLUMNS ( address VARCHAR(100) path '$.address' )
-       ) as jte
-100行
-```

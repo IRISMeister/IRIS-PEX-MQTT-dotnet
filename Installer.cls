@@ -32,11 +32,12 @@ ClassMethod Initialize() As %Status
   set st = ..setup()
   $$$ThrowOnError(st)
  
-  // Switch to INTEROP namespace and load objectscript files in the src directory.
-  ;set $namespace = "AVRO"
-  ;set st = $System.OBJ.LoadDir("/opt/irisbuild/src/", "ck", ,1)
-  ;$$$ThrowOnError(st)
- 
+  #; enable callin. This is required only if you want to try callin.py
+  kill prop
+  Set tSC=##class(Security.Services).Get("%service_callin",.prop)
+  Set prop("Enabled")=1
+  Set tSC=##class(Security.Services).Modify("%service_callin",.prop) 
+
   return $$$OK
 }
 

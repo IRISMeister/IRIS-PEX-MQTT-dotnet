@@ -16,17 +16,16 @@ namespace dc
 	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("avrogen", "1.11.3")]
 	public partial class SimpleClass : global::Avro.Specific.ISpecificRecord
 	{
-		//public static global::Avro.Schema _SCHEMA = global::Avro.Schema.Parse(@"{""type"":""record"",""name"":""SimpleClass"",""namespace"":""foo"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""long""}},{""name"":""myMap"",""type"":{""type"":""map"",""values"":""string""}}]}");
-		public static global::Avro.Schema _SCHEMA = global::Avro.Schema.Parse(@"{""type"":""record"",""name"":""SimpleClass"",""namespace"":""foo"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""long""}}]}");
+		public static global::Avro.Schema _SCHEMA = global::Avro.Schema.Parse(@"{""type"":""record"",""name"":""SimpleClass"",""namespace"":""dc"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myFilename"",""type"":""string""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""long""}}]}");
 		private int _myInt;
 		private long _myLong;
 		private bool _myBool;
 		private double _myDouble;
 		private float _myFloat;
 		private byte[] _myBytes;
+		private string _myFilename;
 		private string _myString;
 		private IList<System.Int64> _myArray;
-		//private IDictionary<string,System.String> _myMap;
 		public virtual global::Avro.Schema Schema
 		{
 			get
@@ -100,6 +99,17 @@ namespace dc
 				this._myBytes = value;
 			}
 		}
+		public string myFilename
+		{
+			get
+			{
+				return this._myFilename;
+			}
+			set
+			{
+				this._myFilename = value;
+			}
+		}
 		public string myString
 		{
 			get
@@ -122,19 +132,6 @@ namespace dc
 				this._myArray = value;
 			}
 		}
-/*
-		public IDictionary<string,System.String> myMap
-		{
-			get
-			{
-				return this._myMap;
-			}
-			set
-			{
-				this._myMap = value;
-			}
-		}
-*/
 		public virtual object Get(int fieldPos)
 		{
 			switch (fieldPos)
@@ -145,9 +142,9 @@ namespace dc
 			case 3: return this.myDouble;
 			case 4: return this.myFloat;
 			case 5: return this.myBytes;
-			case 6: return this.myString;
-			case 7: return this.myArray;
-			//case 8: return this.myMap;
+			case 6: return this.myFilename;
+			case 7: return this.myString;
+			case 8: return this.myArray;
 			default: throw new global::Avro.AvroRuntimeException("Bad index " + fieldPos + " in Get()");
 			};
 		}
@@ -161,9 +158,9 @@ namespace dc
 			case 3: this.myDouble = (System.Double)fieldValue; break;
 			case 4: this.myFloat = (System.Single)fieldValue; break;
 			case 5: this.myBytes = (System.Byte[])fieldValue; break;
-			case 6: this.myString = (System.String)fieldValue; break;
-			case 7: this.myArray = (IList<System.Int64>)fieldValue; break;
-			//case 8: this.myMap = (IDictionary<string,System.String>)fieldValue; break;
+			case 6: this.myFilename = (System.String)fieldValue; break;
+			case 7: this.myString = (System.String)fieldValue; break;
+			case 8: this.myArray = (IList<System.Int64>)fieldValue; break;
 			default: throw new global::Avro.AvroRuntimeException("Bad index " + fieldPos + " in Put()");
 			};
 		}

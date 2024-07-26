@@ -4,14 +4,14 @@
             "webServer": {
                 "scheme": "http",
                 "host": "localhost",
-                "port": 52873
+                "port": 8882
             },
             "username": "_SYSTEM"
         }
     },
     "objectscript.conn": {
         "server": "iris",
-        "ns": "INTEROP",
+        "ns": "AVRO",
         "active": true
     }
 }

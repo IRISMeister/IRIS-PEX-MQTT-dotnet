@@ -34,7 +34,7 @@ $ docker compose down
 |From_MQTT_PEX3([dc.MQTTService3](netgw/mylib1/MQTTService3.cs))|PEX3|Process_MQTT|PEX使用。シリアライズ(文字列化)した配列を使用、応答メッセージを[IRIS Native](src/Solution/SimpleClass.cls)で作成する例|MQTT.SimpleClass|
 |~~From_MQTT_PEX4~~|~~PEX4~~|~~Process_MQTT~~|~~PEX使用。XEPで保存。応答メッセージを[IRIS Native](src/Solution/SimpleClassC.cls)で作成する例~~||
 |From_MQTT_PT|PT|Decode_MQTT_PEX|標準のEnsLib.MQTT.Service.Passthroughサービスを使用|MQTT.SimpleClass|
-|MQTT.BS.PYTHON([MQTT.BS.PYTHON](src\MQTT\BS\PYTHON.cls))|PY|N/A|埋め込みPython使用例|MQTT.SimpleClass|
+|MQTT.BS.PYAVRO([MQTT.BS.PYAVRO](src\MQTT\BS\PYTHON.cls))|PY|N/A|埋め込みPython使用例|MQTT.SimpleClass|
 
 # データの送信方法
 ## 送信する
@@ -52,6 +52,7 @@ $ docker compose down
 |From_MQTT_PEX3|/ID_123/XGH/EKG/PEX3|
 |From_MQTT_PEX4|/ID_123/XGH/EKG/PEX4|
 |From_MQTT_PT|/ID_123/XGH/EKG/PT|
+|MQTT.BS.PYAVRO|/ID_123/XGH/EKG/PY|
 
 下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
 ```
@@ -226,12 +227,28 @@ root@f718a9177d25:/app# ./myapp
 ## 単体実行用に.NETアプリケーションをビルドする環境
 
 SDKが含まれています。
-上記の.NETアプリケーションとは別の場所(donet-devコンテナ内)にデプロイされるので注意。
+上記の.NETアプリケーション実行環境とは別の場所(donet-devコンテナ内)にデプロイされるので注意。
+
+[SimpleClass.avsc](datavol/share/SimpleClass.avsc)を修正した場合、イメージビルド前に手作業でCSクラスを生成する必要がある。
+
+[Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成する。
 ```
 $ docker compose exec dotnet-dev bash
+root@aa9e6466578e:/source# ./gen-avro-cs.sh
+```
+生成されたCSは[SimpleClass.cs](netgw/mylib1/SimpleClass.cs)に出力される。
+
+```
 root@aa9e6466578e:/source# ./build.sh <== ごくシンプルなappの作成例
-root@aa9e6466578e:/source# ./build-netgw.sh <== AVROを使用した例
-root@aa9e6466578e:/source# /app/myapp
+root@aa9e6466578e:/source# /app/ClassLibraryTest <== 同実行方法
+Hello, World!
+GetNumber():123
+Establishing new connection.
+    ・
+    ・
+    ・
+root@aa9e6466578e:/source# ./build-netgw.sh <== netgwで使用するライブラリのビルド
+root@aa9e6466578e:/source# /app/myapp <== 同実行方法
 1
 abc
 dc.MyLibrary
@@ -271,15 +288,16 @@ root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
 ```
 
-## cs用のクラスの生成
 
-[Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成。(dotnet60-dev使用時のみ可能)
+## netgw環境からの実行方法
+
+netgw/genavro/Program.csの実行
 ```
-root@80352f0c46d2:~# avrogen -s /share/SimpleClass.avsc ./gen --namespace foo:foo
+$ docker compose exec netgw /app/genavro
 ```
+
 (参考) https://github.com/apache/avro.git
 
-[そのまま](netgw/SimpleClass.cs)で実行する方法が分からなかったので、[加工](netgw/mylib1/SimpleClass.cs)してある。
 
 ## 参考にしたコードサンプル
 https://github.com/intersystems/Samples-PEX-Course
@@ -355,3 +373,4 @@ XEPに限らないが、メッセージになるクラス(src/Solution/SimpleCla
 - メッセージになるクラスの作成
 
 
+https://qiita.com/akuroda/items/fd3efe9810e5fad9aec5

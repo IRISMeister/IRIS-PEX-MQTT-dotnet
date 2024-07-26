@@ -27,5 +27,5 @@ RUN iris start IRIS \
 	&& iris session IRIS < iris.script \
     && iris stop IRIS quietly
 
-COPY datavol/share/saveAvro2IRIS.py /usr/irissys/mgr/python/
+COPY datavol/share/Save*.py /usr/irissys/mgr/python/
 COPY datavol/share/SimpleClass.avsc /opt/irisbuild/AVRO/

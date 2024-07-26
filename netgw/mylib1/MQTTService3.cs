@@ -21,7 +21,7 @@ namespace dc
             LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
 
             String value = req.GetString("StringValue");
-            LOGINFO("Received StringValue: " + value);
+            //LOGINFO("Received StringValue: " + value);
 
             String topic = req.GetString("Topic");
             LOGINFO("Received topic: " + topic);
@@ -31,23 +31,32 @@ namespace dc
             List<dc.SimpleClass> items = dc.ReflectReader.decode<dc.SimpleClass>(b);
 
             IRIS iris = GatewayContext.GetIRIS();
-            IRISObject newrequest;
-            IRISList myarray = new IRISList();
-            foreach (dc.SimpleClass simple in items)
+            IRISObject newobject,newrequest;
+            
+            seqno=iris.Increment(1,"seq");
+            foreach (dc.SimpleClass item in items)
             {
-                // get unique value via Native API
-                seqno = (long)iris.ClassMethodLong("MQTT.SimpleClass", "GETNEWID");
+
+                // Save bytes as a O/S file
+                using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
+                {
+                    fs.Write(item.myBytes, 0, item.myBytes.Length);
+                }                
 
                 // Pass an array as a comma separated String value.
-                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,"["+String.Join(",",simple.myBytes)+"]",simple.myString,"["+String.Join(",",simple.myArray)+"]");
-                // Iterate through target business components and send request message
-                string[] targetNames = TargetConfigNames.Split(',');
-                foreach (string name in targetNames)
-                {
-                    LOGINFO("Target:" + name);
-                    SendRequestAsync(name, newrequest);
-                }
+                newobject = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,item.myInt,item.myLong,item.myBool,item.myDouble,item.myFloat,item.myFilename,item.myString,"["+String.Join(",",item.myArray)+"]");
+                newobject.InvokeStatusCode("%Save");
             }
+
+            newrequest = (IRISObject)iris.ClassMethodObject("MQTT.REQ.Simple", "%New", seqno,topic);
+            // Iterate through target business components and send request message
+            string[] targetNames = TargetConfigNames.Split(',');
+            foreach (string name in targetNames)
+            {
+                LOGINFO("Target:" + name);
+                SendRequestAsync(name, newrequest);
+            }
+
             return null;
         }
 
