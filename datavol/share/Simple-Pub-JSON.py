@@ -11,7 +11,7 @@ if __name__ == '__main__':
   client.on_publish = on_publish 
   client.connect("localhost")
 
-  f = open('compare.avro', 'rb')
+  f = open('compare.json', 'rb')
   byte_data = f.read()
 
   client.loop_start()
@@ -19,9 +19,9 @@ if __name__ == '__main__':
   if 2 <= len(args):
     if args[1].isdigit():
       for seq in range (0,int(args[1])):
-        msginfo=client.publish("/XGH/EKG/ID_123/PYAVRO/"+str(seq),byte_data,1)
+        msginfo=client.publish("/XGH/EKG/ID_123/PYJSON/"+str(seq),byte_data,1)
   else:
-    msginfo=client.publish("/XGH/EKG/ID_123/PYAVRO/1",byte_data)
+    msginfo=client.publish("/XGH/EKG/ID_123/PYJSON/1",byte_data)
 
   client.loop_stop()
 

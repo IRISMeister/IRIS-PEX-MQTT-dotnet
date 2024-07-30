@@ -32,4 +32,12 @@ Method Save(seq As %Numeric, topic As %String, avromsg As %RawString) As %Status
 	s.save(seq,topic,avromsg)
 }
 
+Method OnInit() As %Status [ Language = python ]
+{
+	import SaveAvro2IRIS as s
+	
+	s.getschema()
+	return True
+}
+
 }

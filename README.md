@@ -39,28 +39,29 @@ $ docker compose down
 # データの送信方法
 ## 送信する
 ```
-# docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT -f /home/irisowner/share/SimpleClass.avro
+# docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PT -f /home/irisowner/share/SimpleClass.avro
 ```
 上記コマンドを実行すると、From_MQTT_PTがMQTTメッセージを受信し、その後の処理が実行されます。
 
 ただし、各BSは、以下のTopicをSubscribeする設定になっています。いずれも[SimpleClass.avsc](datavol/share/SimpleClass.avsc)でエンコードされたデータを受け付けます。
 |受信するBS|Topic|
 |:--|:--|
-|From_MQTT_EXT|/ID_123/XGH/EKG/EXT|  
-|From_MQTT_PEX|/ID_123/XGH/EKG/PEX|
-|From_MQTT_PEX2|/ID_123/XGH/EKG/PEX2|
-|From_MQTT_PEX3|/ID_123/XGH/EKG/PEX3|
-|From_MQTT_PEX4|/ID_123/XGH/EKG/PEX4|
-|From_MQTT_PT|/ID_123/XGH/EKG/PT|
-|MQTT.BS.PYAVRO|/ID_123/XGH/EKG/PY|
+|From_MQTT_EXT|/XGH/EKG/ID_123/EXT|  
+|From_MQTT_PEX|/XGH/EKG/ID_123/PEX|
+|From_MQTT_PEX2|/XGH/EKG/ID_123/PEX2|
+|From_MQTT_PEX3|/XGH/EKG/ID_123/PEX3|
+|From_MQTT_PEX4|/XGH/EKG/ID_123/PEX4|
+|From_MQTT_PT|/XGH/EKG/ID_123/PT|
+|MQTT.BS.PYAVRO|/XGH/EKG/ID_123/PYAVRO|
+|MQTT.BS.PYJSON|/XGH/EKG/ID_123/PYJSON|
 
 下記で、任意のメッセージを送信出来ますが、(当然ながら)AVROとしてデコードしようとしてエラーが発生します。
 ```
-$ docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT -m "anything"
+$ docker compose exec iris mosquitto_pub -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PT -m "anything"
 ```
 必要に応じてサブスクライブ出来ます。
 ```
-$ docker compose exec iris mosquitto_sub -v -h mqttbroker -p 1883 -t /ID_123/XGH/EKG/PT/#
+$ docker compose exec iris mosquitto_sub -v -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PT/#
 ```
 
 ## IRIS側のデータ
@@ -122,10 +123,10 @@ SELECT s.ID,b.bytes,a.longs
 SELECT * FROM MQTT.SimpleClass as s
 | ID | myArray | myBool | myBytes | myDouble | myFloat | myInt | myLong | myString | seq | topic |
 | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
-| 1 | [1,2,3,4,5,6,7,8] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 1 | /ID_123/XGH/EKG/PEX3 |
-| 2 | [11,12,13,14,15,16,17,18] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 2 | /ID_123/XGH/EKG/PEX3 |
-| 3 | [100,200,300,400,500,600,700,800] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 3 | /ID_123/XGH/EKG/PEX3 |
-| 4 | [900,1000,1100,1200,1300,1400,1500,1600] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 4 | /ID_123/XGH/EKG/PEX3 |
+| 1 | [1,2,3,4,5,6,7,8] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 1 | /XGH/EKG/ID_123/PEX3 |
+| 2 | [11,12,13,14,15,16,17,18] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 2 | /XGH/EKG/ID_123/PEX3 |
+| 3 | [100,200,300,400,500,600,700,800] | 1 | [1,2,3,4,5,6,7,8] | 3.1400000000000001243 | .0159000009298324585 | 1 | 2 | this is a 1st SimpleClass | 3 | /XGH/EKG/ID_123/PEX3 |
+| 4 | [900,1000,1100,1200,1300,1400,1500,1600] | 1 | [17,18,19,20,21,22,23,24] | 2.7099999999999999644 | .0159000009298324585 | 10 | 3 | this is a 2nd SimpleClass | 4 | /XGH/EKG/ID_123/PEX3 |
 
 ```
 
@@ -164,10 +165,10 @@ docker compose exec mqttbroker tail -f /mosquitto/log/mosquitto.log
 $ docker compose exec iris iris session iris
 USER>set m=##class(%Net.MQTT.Client).%New("tcp://mqttbroker:1883")
 USER>set tSC=m.Connect()
-USER>set tSC=m.Subscribe("/ID_123/XGH/EKG/PT/#")
+USER>set tSC=m.Subscribe("/XGH/EKG/ID_123/PT/#")
 USER>set tSC=m.Receive(.topic,.message,10000)
 USER>w topic
-/ID_123/XGH/EKG/PT
+/XGH/EKG/ID_123/PT
 USER>w message
 90
 USER>h

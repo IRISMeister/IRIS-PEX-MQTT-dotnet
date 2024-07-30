@@ -9,13 +9,15 @@ XData ProductionDefinition
   <ActorPoolSize>2</ActorPoolSize>
   <Item Name="From_MQTT_PT" Category="" ClassName="EnsLib.MQTT.Service.Passthrough" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">Decode_Process_MQTT</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PT/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PT/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
   </Item>
   <Item Name="From_MQTT_EXT" Category="" ClassName="MQTT.BS.MQTTEXT" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/EXT/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/EXT/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
   </Item>
   <Item Name="Process_MQTT" Category="" ClassName="MQTT.BP.MQTT" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
   </Item>
@@ -45,8 +47,9 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
     <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PEX/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
   </Item>
   <Item Name="From_MQTT_PEX2" Category="" ClassName="MQTT.BS.MQTTPEX" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
@@ -54,8 +57,9 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
     <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX2/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PEX2/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
   </Item>
   <Item Name="From_MQTT_PEX3" Category="" ClassName="MQTT.BS.MQTTPEX" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
@@ -63,19 +67,22 @@ XData ProductionDefinition
     <Setting Target="Host" Name="%gatewayHost">netgw</Setting>
     <Setting Target="Host" Name="%gatewayPort">55556</Setting>
     <Setting Target="Host" Name="%gatewayExtraClasspaths">/app/mylib1.dll</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PEX3/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PEX3/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
     <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
   </Item>
   <Item Name="MQTT.BS.PYAVRO" Category="" ClassName="MQTT.BS.PYAVRO" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PY/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PYAVRO/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
   </Item>
   <Item Name="MQTT.BS.PYJSON" Category="" ClassName="MQTT.BS.PYJSON" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
-    <Setting Target="Adapter" Name="Topic">/ID_123/XGH/EKG/PY2/#</Setting>
+    <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PYJSON/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
+    <Setting Target="Adapter" Name="QOS">1</Setting>
   </Item>
 </Production>
 }

@@ -4,27 +4,29 @@ import avro.schema
 import avro.io
 import json
 
+def getschema():
+	global schema
+	datadir="/datavol/share/"
+	schema = avro.schema.parse(open(datadir+'SimpleClass.avsc', 'rb').read())
+
 # copy me in mgr\python\
-def save(seq,topic,avromsg,extra=''):
+def save(seq,topic,avromsg):
 	import iris
 	#print(iris.cls('%SYSTEM.Version').GetVersion())
 	#print(os.getcwd())
-	
 	# 注意) import irisはカレントを'/usr/irissys/mgr/user'に移動させる
-	# コンテナ環境ではファイルを/opt/irisbuild/AVRO/にcopyしているのでpath指定無しでアクセスできる。
-	schema = avro.schema.parse(open(extra+'SimpleClass.avsc', 'rb').read())
 
 	bytes_reader = io.BytesIO(avromsg)
 	decoder = avro.io.BinaryDecoder(bytes_reader)
 	reader = avro.io.DatumReader(schema)
 
 	iris.system.Process.SetNamespace('AVRO')
+	# python3では、しばしば<UNIMPLEMENTED>ddtab+73^%qaqpsq, <UNIMPLEMENTED>term+84^%qaqpslxでエラーになる(動作することもある)。不安定なのでirispythonを使う。
 	sql = "INSERT INTO MQTT.SimpleClass (myArray, myBool, myFilename, myDouble, myFloat, myInt, myLong, myString,seq, topic) VALUES(?,?,?,?,?,?,?,?,?,?)"
 	stmt = iris.sql.prepare(sql)
 
 	while bytes_reader.tell() < len(bytes_reader.getvalue()):
 		data = reader.read(decoder)
-		#print(data)
 		with open(data['myFilename'], 'wb') as f:
 			f.write(data['myBytes'])
 		try: 
@@ -35,22 +37,33 @@ def save(seq,topic,avromsg,extra=''):
 
 	return 0
 
+
+globalschema=''
+
 if __name__ == '__main__':
 	import platform
 	import sys
 
+	global schema
+	args = sys.argv
 	pf = platform.system()
 	if pf == 'Windows':
-		cwd=os.getcwd()+'\\'
+		datadir="/datavol/share/"
 		sys.path += ['c:\\intersystems\\iris\\lib\\python','c:\\intersystems\\iris\\mgr\\python']
 	elif pf == 'Linux':
-		cwd=os.getcwd()+'/'
+		datadir="/datavol/share/"
 		sys.path += ['/usr/irissys/lib/python/','/usr/irissys/mgr/python/']
 
-	avrofile='SimpleClass.avro'
+	#avrofile='SimpleClass.avro'
+	avrofile=datadir+'compare.avro'
 	fr = open(avrofile, 'rb')
 	byte_data = fr.read()	
-	seq=1
-	topic="mytopic"
+	topic="/XGH/EKG/ID_123/PYAVRO/"
+	schema = avro.schema.parse(open(datadir+'SimpleClass.avsc', 'rb').read())
 
-	sys.exit(save(seq,topic,byte_data,extra=cwd))
+	if 2 <= len(args):
+		if args[1].isdigit():
+			for seq in range (0,int(args[1])):
+				save(seq+1,topic+str(seq+1),byte_data)
+	else:
+		sys.exit(save(1,topic+'1',byte_data))

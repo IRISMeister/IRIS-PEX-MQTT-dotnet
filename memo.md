@@ -80,19 +80,87 @@ long(64 bits=8 bytesの整数)も、数値が大きいとサイズの差が開�
 >>> 2**60
 1152921504606846976 <== 19 bytes
 
-## 
+## デコードのコスト
+
+AVROを連続保存
+```
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveAvro2IRIS.py 3000
+```
+
+JSONを連続保存
+```
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON2IRIS.py 3000
+```
+
+保存にかかった時間を取得する。
+```
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
+FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
+Aggregate_1	Expression_2
+3000	2945
+
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
+FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
+
+Aggregate_1	Expression_2
+3000	792
+```
+
+JSONのほうがかなり速いという結果に。JSON文字列からJSONへのデコードは軽い(ほぼ変換無しだから)という事。
+
+
+## 送受信＋デコードのコスト
+
+Pythonで使用したライブラリ
+https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html
+
+どの程度送受信に時間を要するかを比較しようと思ったが、QoS=0では100件全てをとれてなかった。QoS=1にするとさらに減って19件に...。
+==>  client.loop_start()を追加したら期待した動作(100件取得)となった。QoS=0に戻した。
+==> 3000件送ると取りこぼす。==> confにmax_queued_messages 0を追加して対処(0=No limiは非推奨らしいが、それが目的ではないので良しとする)
+
+AVROを連続送信
+```
+送信側
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYAVRO -f /home/irisowner/share/compare.avro
+あるいは下記で連続投入実施
+python3 Simple-Pub-AVRO.py 3000
+
+受信側
+IRISのMQTT.BS.PYAVRO
+あるいは
+docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PYAVRO/#
 
 ```
-docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY -f /home/irisowner/share/compare.avro
+
+JSONを連続送信
+```
+送信側
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYJSON -f /home/irisowner/share/compare.json
 あるいは下記で連続投入実施
-python3 Simple-Pub-AVRO.py
+python3 Simple-Pub-JSON.py 3000
+
+受信側
+IRISのMQTT.BS.PYJSON
+あるいは
+docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PYJSON/#
 ```
 
+実行後に
 ```
-docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY2 -f /home/irisowner/share/compare.json
-あるいは下記で連続投入実施
-python3 Simple-Pub-JSON.py
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
+FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
+Aggregate_1	Expression_2
+3000	9033
+
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
+FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
+Aggregate_1	Expression_2
+3000	6752
 ```
+差は縮まったが、まだ、JSONのほうが速い。通信がlocalhost間でほぼ遅延無しだからか？
+
+## ノード越えの送受信
+
 
 
 ## スキーマを定義
@@ -123,7 +191,7 @@ jsonやxmlはマシンリーダブルかつヒューマンリーダブル。
 
 MQTTのパケットサイズの上限: 268435455 Bytes = 256 MB
 ```
-docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /ID_123/XGH/EKG/PY -f /home/irisowner/share/400MB.avro
+docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYAVRO -f /home/irisowner/share/400MB.avro
 Error: File must be less than 268435455 bytes.
 ```
 
@@ -178,7 +246,7 @@ Windowsでの実行
 mqtt server
 "\Program Files"\mosquitto\mosquitto -v
 mqtt client
-"\Program Files"\mosquitto\mosquitto_pub -h localhost -p 1883 -t /ID_123/XGH/EKG/PY -f C:\git\IRIS-PEX-MQTT-dotnet\datavol\share\SimpleClass.avro
+"\Program Files"\mosquitto\mosquitto_pub -h localhost -p 1883 -t /XGH/EKG/ID_123/PYAVRO -f C:\git\IRIS-PEX-MQTT-dotnet\datavol\share\SimpleClass.avro
 ```
 
 
