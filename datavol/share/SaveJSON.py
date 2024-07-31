@@ -16,13 +16,14 @@ def save(seq,topic,msg,extra=''):
 	json_str = msg.decode('utf-8')
 	data = json.loads(json_str)
 
-	sql = "INSERT INTO MQTT.SimpleClass (myArray, myBool, myFilename, myDouble, myFloat, myInt, myLong, myString,seq, topic) VALUES(?,?,?,?,?,?,?,?,?,?)"
+	sql = "INSERT INTO MQTT.SimpleClass (myArray, myBool, myBytes, myDouble, myFloat, myInt, myLong, myString,seq, topic) VALUES(?,?,?,?,?,?,?,?,?,?)"
 	stmt = iris.sql.prepare(sql)
 	
-	with open(data['myFilename'], 'wb') as f:
-		f.write(base64.b64decode(data['myBytes']))
+	#with open(data['myFilename'], 'wb') as f:
+	#	f.write(base64.b64decode(data['myBytes']))
+	myBytes=base64.b64decode(data['myBytes']).decode('utf-8')
 	try: 
-		rs=stmt.execute(json.dumps(data['myArray']),int(data['myBool']),data['myFilename'],data['myDouble'],data['myFloat'],data['myInt'],data['myLong'],data['myString'],seq,topic)
+		rs=stmt.execute(json.dumps(data['myArray']),int(data['myBool']),myBytes,data['myDouble'],data['myFloat'],data['myInt'],data['myLong'],data['myString'],seq,topic)
 	except Exception as ex:
 		if ex.sqlcode != 0:
 			print ('SQL error', ex.message, ex.sqlcode, ex.statement)

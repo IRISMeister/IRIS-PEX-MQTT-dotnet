@@ -82,7 +82,7 @@ long(64 bits=8 bytesの整数)も、数値が大きいとサイズの差が開�
 >>> 2**60
 1152921504606846976 <== 19 bytes
 
-## デコードのコスト
+## デコードと保存のコスト
 
 AVROを連続保存
 ```
@@ -96,13 +96,11 @@ docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 
 
 保存にかかった時間を取得する。
 ```
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
-FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
 Aggregate_1	Expression_2
 3000	2945
 
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
-FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
 
 Aggregate_1	Expression_2
 3000	792
@@ -149,11 +147,9 @@ docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/I
 
 実行後に
 ```
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
 Aggregate_1	Expression_2
 3000	9033
 
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
 Aggregate_1	Expression_2
 3000	6752
 ```
@@ -166,22 +162,17 @@ Azure
 AVRO
 | Aggregate_1 | Expression_2 |
 | -- | -- |
-| 3000 | 13313 |
+| 3000 | 10519 |
 
 JSON
 | Aggregate_1 | Expression_2 |
 | -- | -- |
-| 3000 | 9912 |
+| 3000 | 10397 |
 
-
-JSON
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 1000 | 5184 |
 
 ```
 
-JSONのほうが速い。デコードのコストの低さが、通信コストの高さに勝っている模様。ネットワークが空いているせいもある？
+JSONのほうが若干速い。デコードのコストの低さが、通信コストの高さに勝っている模様。ネットワークが空いているせいもある？
 
 
 
@@ -288,5 +279,34 @@ docker compose exec netgw /app/genavro
 netgw/myapp/Program.csの実行
 docker compose exec netgw /app/myapp
 ```
+
+
+## install to bare O/S
+
+IRIS+MQTT Broker
+```
+sudo apt update
+wget -O get-docker.sh https://get.docker.com
+sudo sh ./get-docker.sh
+sudo usermod -aG docker $USER
+git clone https://github.com/IRISMeister/IRIS-PEX-MQTT-dotnet.git
+cd IRIS-PEX-MQTT-dotnet
+./build.sh
+./up.sh
+
+select count(*) FROM MQTT.SimpleClass
+```
+
+mqtt client
+```
+sudo apt update
+sudo apt install -y mosquitto-clients python3-pip
+git clone https://github.com/IRISMeister/IRIS-PEX-MQTT-dotnet.git
+cd IRIS-PEX-MQTT-dotnet/datavol/share
+pip3 install avro fastavro paho-mqtt
+vi Pub-AVRO.py localhost->linux1
+python3 Pub-AVRO.py 1
+```
+
 
 

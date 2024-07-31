@@ -10,16 +10,20 @@ schema = avro.schema.parse(open('SimpleClass.avsc', 'rb').read())
 writer = avro.io.DatumWriter(schema)
 bytes_writer = io.BytesIO()
 encoder = avro.io.BinaryEncoder(bytes_writer)
-with open('shrimp.png', 'rb') as f:
-    myBytes=f.read()
+
+#with open('shrimp.png', 'rb') as f:
+#    myBytes=f.read()
+
+arraysize=100
+myBytes = bytes(range(0, arraysize))
 
 rondom_list1 = []
 
-for k in range(100):
+for k in range(arraysize):
   x = random.randint(2**50,2**60)
   rondom_list1.append(x)
 
-data = {'myInt': 1, 'myLong': 2, 'myBool': True, 'myDouble': 3.14, 'myFloat': 0.01590000092983246, 'myBytes': myBytes , 'myFilename': 'shrimp.png', 'myString': 'this is a 1st SimpleClass', 'myArray': rondom_list1}
+data = {'myInt': 1, 'myLong': 2, 'myBool': True, 'myDouble': 3.14, 'myFloat': 0.01590000092983246, 'myBytes': myBytes , 'myFilename': 'data.hex', 'myString': 'this is a 1st SimpleClass', 'myArray': rondom_list1}
 writer.write(data,encoder)
 
 raw_bytes = bytes_writer.getvalue()
