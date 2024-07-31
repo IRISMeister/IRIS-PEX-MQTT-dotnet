@@ -4,9 +4,8 @@ import avro.schema
 import avro.io
 import json
 
-def getschema():
+def getschema(datadir):
 	global schema
-	datadir="/datavol/share/"
 	schema = avro.schema.parse(open(datadir+'SimpleClass.avsc', 'rb').read())
 
 # copy me in mgr\python\
@@ -43,6 +42,7 @@ globalschema=''
 if __name__ == '__main__':
 	import platform
 	import sys
+	import time
 
 	global schema
 	args = sys.argv
@@ -54,16 +54,20 @@ if __name__ == '__main__':
 		datadir="/datavol/share/"
 		sys.path += ['/usr/irissys/lib/python/','/usr/irissys/mgr/python/']
 
-	#avrofile='SimpleClass.avro'
 	avrofile=datadir+'compare.avro'
 	fr = open(avrofile, 'rb')
 	byte_data = fr.read()	
 	topic="/XGH/EKG/ID_123/PYAVRO/"
-	schema = avro.schema.parse(open(datadir+'SimpleClass.avsc', 'rb').read())
+	getschema(datadir)
+	
+	start = time.time()
 
 	if 2 <= len(args):
 		if args[1].isdigit():
 			for seq in range (0,int(args[1])):
 				save(seq+1,topic+str(seq+1),byte_data)
 	else:
-		sys.exit(save(1,topic+'1',byte_data))
+		save(1,topic+'1',byte_data)
+
+	t = time.time() - start
+	print(t)

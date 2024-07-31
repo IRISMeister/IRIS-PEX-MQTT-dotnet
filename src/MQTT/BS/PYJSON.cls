@@ -26,9 +26,17 @@ Method OnProcessInput(pInput As EnsLib.MQTT.Message, pOutput As %RegisteredObjec
 
 Method Save(seq As %Numeric, topic As %String, avromsg As %RawString) As %Status [ Language = python ]
 {
-	import SaveJSON2IRIS as s
+	import SaveJSON as s
 	
 	s.save(seq,topic,avromsg)
+}
+
+Method OnInit() As %Status [ Language = python ]
+{
+	import SaveJSON as s
+	
+	s.init()
+	return True
 }
 
 }

@@ -26,17 +26,16 @@ Method OnProcessInput(pInput As EnsLib.MQTT.Message, pOutput As %RegisteredObjec
 
 Method Save(seq As %Numeric, topic As %String, avromsg As %RawString) As %Status [ Language = python ]
 {
-	# import IRISDIR/mgr/python/SaveAvro2IRIS.py
-	import SaveAvro2IRIS as s
+	import SaveFastAVRO as s
 	
 	s.save(seq,topic,avromsg)
 }
 
 Method OnInit() As %Status [ Language = python ]
 {
-	import SaveAvro2IRIS as s
+	import SaveFastAVRO as s
 	
-	s.getschema()
+	s.init('/datavol/share/')
 	return True
 }
 

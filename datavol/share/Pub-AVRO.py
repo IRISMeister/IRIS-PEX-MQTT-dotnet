@@ -16,12 +16,17 @@ if __name__ == '__main__':
 
   client.loop_start()
 
+  if 3 <= len(args):
+    target=args[2]
+  else:
+    target='PYAVRO'
+
   if 2 <= len(args):
     if args[1].isdigit():
       for seq in range (0,int(args[1])):
-        msginfo=client.publish("/XGH/EKG/ID_123/PYAVRO/"+str(seq),byte_data,1)
+        msginfo=client.publish("/XGH/EKG/ID_123/"+target+"/"+str(seq),byte_data,1)
   else:
-    msginfo=client.publish("/XGH/EKG/ID_123/PYAVRO/1",byte_data)
+    msginfo=client.publish("/XGH/EKG/ID_123/"+target+"/1",byte_data)
 
   client.loop_stop()
 

@@ -45,6 +45,8 @@ AVRO
 
 サイズがより小さい、スキーマを定義できる、データ型が豊富、マシンリーダブル。
 
+https://fastavro.readthedocs.io/en/latest/ 
+> pythonの場合,fastavroじゃないと遅すぎる。
 
 
 JSON
@@ -84,12 +86,12 @@ long(64 bits=8 bytesの整数)も、数値が大きいとサイズの差が開�
 
 AVROを連続保存
 ```
-docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveAvro2IRIS.py 3000
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveAVRO.py 3000
 ```
 
 JSONを連続保存
 ```
-docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON2IRIS.py 3000
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 3000
 ```
 
 保存にかかった時間を取得する。
@@ -118,12 +120,12 @@ https://eclipse.dev/paho/files/paho.mqtt.python/html/client.html
 ==>  client.loop_start()を追加したら期待した動作(100件取得)となった。QoS=0に戻した。
 ==> 3000件送ると取りこぼす。==> confにmax_queued_messages 0を追加して対処(0=No limiは非推奨らしいが、それが目的ではないので良しとする)
 
-AVROを連続送信
+AVROを送信
 ```
-送信側
+単独送信
 docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYAVRO -f /home/irisowner/share/compare.avro
-あるいは下記で連続投入実施
-python3 Simple-Pub-AVRO.py 3000
+連続送信
+python3 Pub-AVRO.py 3000
 
 受信側
 IRISのMQTT.BS.PYAVRO
@@ -134,10 +136,10 @@ docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/I
 
 JSONを連続送信
 ```
-送信側
+単独送信
 docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYJSON -f /home/irisowner/share/compare.json
-あるいは下記で連続投入実施
-python3 Simple-Pub-JSON.py 3000
+連続送信
+python3 Pub-JSON.py 3000
 
 受信側
 IRISのMQTT.BS.PYJSON
@@ -147,19 +149,39 @@ docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/I
 
 実行後に
 ```
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
-FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
 Aggregate_1	Expression_2
 3000	9033
 
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} 
-FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
+SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
 Aggregate_1	Expression_2
 3000	6752
 ```
 差は縮まったが、まだ、JSONのほうが速い。通信がlocalhost間でほぼ遅延無しだからか？
 
 ## ノード越えの送受信
+
+Azure
+```
+AVRO
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 3000 | 13313 |
+
+JSON
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 3000 | 9912 |
+
+
+JSON
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 1000 | 5184 |
+
+```
+
+JSONのほうが速い。デコードのコストの低さが、通信コストの高さに勝っている模様。ネットワークが空いているせいもある？
 
 
 

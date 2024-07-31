@@ -22,10 +22,6 @@ for k in range(100):
 data = {'myInt': 1, 'myLong': 2, 'myBool': True, 'myDouble': 3.14, 'myFloat': 0.01590000092983246, 'myBytes': myBytes , 'myFilename': 'shrimp.png', 'myString': 'this is a 1st SimpleClass', 'myArray': rondom_list1}
 writer.write(data,encoder)
 
-data['myBytes']=base64.b64encode(data['myBytes']).decode('ascii')
-with open('compare.json', 'a') as f:
-    json.dump(data,f)
-
 raw_bytes = bytes_writer.getvalue()
 print(len(raw_bytes))
 print(type(raw_bytes))
@@ -33,4 +29,8 @@ print(type(raw_bytes))
 f = open('compare.avro', 'wb')
 f.write(raw_bytes)
 f.close()
+
+data['myBytes']=base64.b64encode(data['myBytes']).decode('ascii')
+with open('compare.json', 'w') as f:
+    json.dump(data,f)
 

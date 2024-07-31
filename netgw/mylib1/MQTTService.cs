@@ -18,13 +18,13 @@ namespace dc
             long seqno;
 
             IRISObject req = (IRISObject)request;
-            LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
+            //LOGINFO("Received object: " + req.InvokeString("%ClassName", 1));
 
             String value = req.GetString("StringValue");
             //LOGINFO("Received StringValue: " + value);
 
             String topic = req.GetString("Topic");
-            LOGINFO("Received topic: " + topic);
+            //LOGINFO("Received topic: " + topic);
 
             // Decode AVRO
             byte[] b = req.GetBytes("StringValue");
@@ -51,7 +51,7 @@ namespace dc
             string[] targetNames = TargetConfigNames.Split(',');
             foreach (string name in targetNames)
             {
-                LOGINFO("Target:" + name);
+                //LOGINFO("Target:" + name);
                 SendRequestAsync(name, newrequest);
             }
             

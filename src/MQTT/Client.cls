@@ -53,15 +53,15 @@ Method Receive(m)
 
 Method Save(seq As %Numeric, topic As %String, avromsg As %RawString) [ Language = python ]
 {
-	# import IRISDIR/mgr/python/SaveAvro2IRIS.py
-	import SaveAvro2IRIS as s
+	# import IRISDIR/mgr/python/SaveAVRO.py
+	import SaveFastAVRO as s
 	
 	s.save(seq,topic,avromsg)
 }
 
 Method Init() [ Language = python ]
 {
-	import SaveAvro2IRIS as s
+	import SaveFastAVRO as s
 	
 	s.getschema()
 	return True

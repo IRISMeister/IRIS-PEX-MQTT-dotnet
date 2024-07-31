@@ -17,7 +17,7 @@ RUN mkdir /opt/irisbuild && chown irisowner:irisowner /opt/irisbuild
 WORKDIR /opt/irisbuild
 
 USER irisowner
-RUN pip install avro -t /usr/irissys/mgr/python
+RUN pip install avro fastavro -t /usr/irissys/mgr/python
 
 COPY ./src ./src/
 COPY ./Installer.cls ./

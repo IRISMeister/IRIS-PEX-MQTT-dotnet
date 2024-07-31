@@ -1,2 +1,3 @@
 avro
+fastavro
 paho-mqtt
