@@ -20,7 +20,7 @@ myBytes = bytes(range(0, arraysize))
 rondom_list1 = []
 
 for k in range(arraysize):
-  x = random.randint(2**50,2**60)
+  x = random.random()
   rondom_list1.append(x)
 
 data = {'myInt': 1, 'myLong': 2, 'myBool': True, 'myDouble': 3.14, 'myFloat': 0.01590000092983246, 'myBytes': myBytes , 'myFilename': 'data.hex', 'myString': 'this is a 1st SimpleClass', 'myArray': rondom_list1}

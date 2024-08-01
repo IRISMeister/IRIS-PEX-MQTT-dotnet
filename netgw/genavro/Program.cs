@@ -67,7 +67,7 @@ namespace dc
                 myBytes = new byte[3] { 0x01, 0x02, 0x03 },
                 myFilename = "filename.png",
                 myString = "def",
-                myArray = new long[3] { 1, 2, 3 }
+                myArray = new double[3] { 0.1, 0.2, 0.3 }
             };
             Avro.Schema schema2 =SimpleClass._SCHEMA;
             var r2 = ReflectReader.schema2<SimpleClass>(schema2, s);

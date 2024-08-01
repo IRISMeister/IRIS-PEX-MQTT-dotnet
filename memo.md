@@ -71,22 +71,23 @@ AVROは、もともとHadoopのデータ保存形式なので、Hadoop/Spark由�
 
 ```
 $ python3 CompareSize.py
- 
--rw-r--r-- 1 irismeister irismeister  2644  7月 26 12:25 compare.avro
--rw-r--r-- 1 irismeister irismeister  4449  7月 26 12:25 compare.json
+$ ll 
+-rw-r--r-- 1 irismeister irismeister  955  8月  1 14:05 compare.avro
+-rw-r--r-- 1 irismeister irismeister 2345  8月  1 14:05 compare.json
 ```
 
-base64は24 bits(8 bits*3)を6 bits*4に変換するので、一番サイズが大きい要素であるバイト配列は1.3倍程度の大きさになる。
+base64は24 bits(8 bits*3)を6 bits*4に変換するので、バイト配列は1.3倍程度の大きさになる。
 
-long(64 bits=8 bytesの整数)も、数値が大きいとサイズの差が開く。下記の例だと19/8=2.4倍程度。
->>> 2**60
-1152921504606846976 <== 19 bytes
+double(64 bits 浮動小数点)も、有効精度次第でサイズの差が開く。下記の例だと18/8=2.25倍。
+
+json:   0.6041420355438344 <== 18 bytes
+binary: 8 bytes
 
 ## デコードと保存のコスト
 
 AVROを連続保存
 ```
-docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveAVRO.py 3000
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 3000
 ```
 
 JSONを連続保存
@@ -96,17 +97,30 @@ docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 
 
 保存にかかった時間を取得する。
 ```
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYAVRO/%' ORDER BY ID DESC)
-Aggregate_1	Expression_2
-3000	2945
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+(実行内容 DELETE FROM MQTT.SimpleClass)
 
-SELECT COUNT(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM (SELECT TOP 3000 ReceiveTS FROM MQTT.SimpleClass WHERE topic like '/XGH/EKG/ID_123/PYJSON/%' ORDER BY ID DESC)
-
-Aggregate_1	Expression_2
-3000	792
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+(実行内容 SELECT count(*),{fn TIMESTAMPDIFF(SQL_TSI_FRAC_SECOND,MIN(ReceiveTS),MAX(ReceiveTS))} FROM MQTT.SimpleClass)
 ```
 
-JSONのほうがかなり速いという結果に。JSON文字列からJSONへのデコードは軽い(ほぼ変換無しだから)という事。
+
+実行手順と結果
+```
+AVRO
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 3000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+[0]: [3000, 444]
+
+JSON
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 3000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+[0]: [3000, 462]
+```
+
+JSON文字列からJSONへのデコードは軽い(ほぼ変換無しだから)。
 
 
 ## 送受信＋デコードのコスト
@@ -129,10 +143,9 @@ python3 Pub-AVRO.py 3000
 IRISのMQTT.BS.PYAVRO
 あるいは
 docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PYAVRO/#
-
 ```
 
-JSONを連続送信
+JSONを送信
 ```
 単独送信
 docker compose exec iris mosquitto_pub -h "mqttbroker" -p 1883 -t /XGH/EKG/ID_123/PYJSON -f /home/irisowner/share/compare.json
@@ -145,34 +158,25 @@ IRISのMQTT.BS.PYJSON
 docker compose exec iris mosquitto_sub -F %t -h mqttbroker -p 1883 -t /XGH/EKG/ID_123/PYJSON/#
 ```
 
-実行後に
-```
-Aggregate_1	Expression_2
-3000	9033
+実行手順と結果
 
-Aggregate_1	Expression_2
-3000	6752
-```
-差は縮まったが、まだ、JSONのほうが速い。通信がlocalhost間でほぼ遅延無しだからか？
-
-## ノード越えの送受信
-
-Azure
 ```
 AVRO
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 3000 | 10519 |
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+python3 Pub-AVRO.py 3000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+[0]: [3000, 6163]
 
 JSON
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 3000 | 10397 |
-
-
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+python3 Pub-JSON.py 3000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+[0]: [3000, 6785]
 ```
 
-JSONのほうが若干速い。デコードのコストの低さが、通信コストの高さに勝っている模様。ネットワークが空いているせいもある？
+差が広がった。通信がlocalhost間でほぼ遅延無しなので、通信の影響が過小評価されている。
+
+## ノード越えの送受信
 
 
 
@@ -283,6 +287,8 @@ docker compose exec netgw /app/myapp
 
 ## install to bare O/S
 
+Azure: Standard D4s v3 (4 vcpu 数、16 GiB メモリ) Linux 22.04LTS、Diskは内蔵のみ、高速ネットワーク:有効 * 2台
+
 IRIS+MQTT Broker
 ```
 sudo apt update
@@ -294,8 +300,6 @@ cd IRIS-PEX-MQTT-dotnet
 ./build.sh
 ./up.sh
 
-select count(*) FROM MQTT.SimpleClass
-```
 
 mqtt client
 ```
@@ -307,6 +311,92 @@ pip3 install avro fastavro paho-mqtt
 vi Pub-AVRO.py localhost->linux1
 python3 Pub-AVRO.py 1
 ```
+
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 3000
+
+========================================
+デコード＋保存
+azureuser@linux1:~/IRIS-PEX-MQTT-dotnet$ 
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 50000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+11.708975315093994
+
+azureuser@linux1:~/IRIS-PEX-MQTT-dotnet$ 
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 50000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+9.861121654510498
+
+========================================
+送受信+デコード＋保存
+
+◎高速ネットワークを有効にした場合
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
+
+avro
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+python3 Pub-AVRO.py 50000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 50000 | 167095 |
+
+json
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
+python3 Pub-JSON.py 50000
+docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
+
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 50000 | 162266 | <=JSONの勝ち。
+
+
+参考：PEX3, Native経由で%New()で保存するスタイル。
+python3 Pub-JSON.py 50000 PEX3
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 50000 | 397829 |
+
+
+◎高速ネットワークを無効にした場合
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
+PING linux1.niygjosa54xulgveevikrsghsb.lx.internal.cloudapp.net (10.0.0.4) 56(84) bytes of data.
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=1 ttl=64 time=0.654 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=2 ttl=64 time=0.827 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=3 ttl=64 time=0.906 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=4 ttl=64 time=0.897 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=5 ttl=64 time=0.913 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=6 ttl=64 time=1.62 ms
+64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=7 ttl=64 time=0.954 ms
+
+送受信+デコード＋保存
+
+avro
+python3 Pub-AVRO.py 50000
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 50000 | 183883 | <== AVROの勝ち
+
+python3 Pub-JSON.py 50000
+json
+| Aggregate_1 | Expression_2 |
+| -- | -- |
+| 50000 | 194701 |
+
+結論
+pythonのデコードの遅さが足を引っ張る。JSONと比べた際のAVROにそれほどの優位性は認められなかった。
+通信がネックになる状況では、AVROの有用性が出てくる。
+データの内容によっては差は拡大・縮小する。逆転もあり得る。
+(いつもの事ですが)要は使いどころ。
+
+Pythonのさらなる高速化に期待
+https://github.com/markshannon/faster-cpython/blob/master/plan.md
+
+```
+
+
 
 
 

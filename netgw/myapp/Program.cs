@@ -43,6 +43,21 @@ namespace dc
                 IRISObject msg = my.GetEnsLibMQTT(iris_object_id);
                 byte[] b = msg.GetBytes("StringValue");
                 Console.WriteLine(b.Length+ " bytes received.");
+
+                Console.WriteLine("Values read from EnsLib.MQTT.Message.");
+                List<dc.SimpleClass> items = dc.ReflectReader.decode<dc.SimpleClass>(b);
+                foreach (dc.SimpleClass item in items)
+                {
+                    Console.WriteLine("myString:{0} ", item.myString);
+                    Console.Write("myBytes: ");
+                    for (int i = 0; i < item.myBytes.Length; i++)
+                    {
+                        Console.Write("[{0}] ", item.myBytes[i].ToString());
+                    }                
+                }
+                Console.WriteLine("");
+
+                // Another way. 
                 MemoryStream myms = new MemoryStream();
                 myms.Write(b, 0, b.Length);
                 myms.Position = 0;
@@ -62,16 +77,21 @@ namespace dc
                 myms.Position = 0;
 
                 SimpleClass s=ReflectReader.deserialize<SimpleClass>(myms,ws,rs);
-
                 Console.WriteLine("Received ToString():"+s.ToString());
                 Console.WriteLine("Received GetType():"+s.GetType());
 
-                Console.WriteLine("Values read from EnsLib.MQTT.Message.");
                 Console.WriteLine("myString:{0} ", s.myString);
+                Console.WriteLine("myInt:{0} ", s.myInt);
                 Console.Write("myBytes: ");
                 for (int i = 0; i < s.myBytes.Length; i++)
                 {
                     Console.Write("[{0}] ", s.myBytes[i].ToString());
+                }                
+                Console.WriteLine("");
+                Console.Write("myArray: ");
+                for (int i = 0; i < s.myArray.Count; i++)
+                {
+                    Console.Write("[{0}] ", s.myArray[i].ToString());
                 }                
                 
                 Console.WriteLine(" ");

@@ -12,6 +12,6 @@
          { "name" : "myBytes", "type" : "bytes" },
          { "name" : "myFilename", "type" : "string" },
          { "name" : "myString", "type" : "string" },
-         { "name" : "myArray", "type" : { "type" : "array", "items" : "long" } }
+         { "name" : "myArray", "type" : { "type" : "array", "items" : "double" } }
    ]
 }

@@ -38,13 +38,15 @@ namespace dc
             {
 
                 // Save bytes as a O/S file
+                /*
                 using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
                 {
                     fs.Write(item.myBytes, 0, item.myBytes.Length);
-                }                
+                } 
+                */               
 
                 // Pass an array as a comma separated String value.
-                newobject = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,item.myInt,item.myLong,item.myBool,item.myDouble,item.myFloat,item.myFilename,item.myString,"["+String.Join(",",item.myArray)+"]");
+                newobject = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,item.myInt,item.myLong,item.myBool,item.myDouble,item.myFloat,item.myBytes,item.myString,"["+String.Join(",",item.myArray)+"]");
                 newobject.InvokeStatusCode("%Save");
             }
 

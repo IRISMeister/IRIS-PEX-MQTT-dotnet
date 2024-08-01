@@ -231,6 +231,7 @@ SDKが含まれています。
 上記の.NETアプリケーション実行環境とは別の場所(donet-devコンテナ内)にデプロイされるので注意。
 
 [SimpleClass.avsc](datavol/share/SimpleClass.avsc)を修正した場合、イメージビルド前に手作業でCSクラスを生成する必要がある。
+> 生成されたファイルをソース管理に加えたかったので、イメージビルドに組み込んでいません
 
 [Apache.Avro.Tools](https://www.nuget.org/packages/Apache.Avro.Tools/)を使って、avro schemaからC#クラスを作成する。
 ```
@@ -239,36 +240,14 @@ root@aa9e6466578e:/source# ./gen-avro-cs.sh
 ```
 生成されたCSは[SimpleClass.cs](netgw/mylib1/SimpleClass.cs)に出力される。
 
+
+以下は、使用例。
+>イメージビルド時に組み込んである
+
+[netgw/myapp/Program.cs](netgw/myapp/Program.cs)のビルドおよび実行
 ```
-root@aa9e6466578e:/source# ./build.sh <== ごくシンプルなappの作成例
-root@aa9e6466578e:/source# /app/ClassLibraryTest <== 同実行方法
-Hello, World!
-GetNumber():123
-Establishing new connection.
-    ・
-    ・
-    ・
-root@aa9e6466578e:/source# ./build-netgw.sh <== netgwで使用するライブラリのビルド
-root@aa9e6466578e:/source# /app/myapp <== 同実行方法
-1
-abc
-dc.MyLibrary
-106 bytes received.
-Received ToString():dc.SimpleClass
-Received GetType():dc.SimpleClass
-Values read from EnsLib.MQTT.Message.
-myString:this is a SimpleClass
-myBytes: [1] [2] [3]
-System.NullReferenceException: Object reference not set to an instance of an object.
-   at InterSystems.Data.IRISClient.ADO.IRIS.CreateIRIS(IRISADOConnection conn)
-   at dc.MyLibrary.DoSomethingNative(String mqtttopic, String mqttmsg) in /source/mylib1/MyLibrary.cs:line 36
-Establishing new connection.
-System.NullReferenceException: Object reference not set to an instance of an object.
-   at InterSystems.Data.IRISClient.ADO.IRIS.CreateIRIS(IRISADOConnection conn)
-   at dc.MyLibrary.DoSomethingSQL(String mqtttopic, String mqttmsg) in /source/mylib1/MyLibrary.cs:line 112
-Establishing new connection.
-Hit any key
-root@aa9e6466578e:/source# dotnet /app/genavro.dll
+root@aa9e6466578e:/source# ./build-netgw.sh <== ライブラリのビルド
+root@aa9e6466578e:/source# /app/genavro.dll <== 同実行方法
 Generating avro files.
 2 objects found.
 Class=System.String, Value=aaa
@@ -287,6 +266,41 @@ this is a SimpleClass
 root@aa9e6466578e:/source# ls -l *.avro
 -rw-r--r-- 1 root root 139 Dec 10 18:34 ComplexClass.avro
 -rw-r--r-- 1 root root 106 Dec 10 18:34 SimpleClass.avro
+
+root@aa9e6466578e:/source# /app/myapp 
+1
+abc
+dc.MyLibrary
+106 bytes received.
+Received ToString():dc.SimpleClass
+Received GetType():dc.SimpleClass
+Values read from EnsLib.MQTT.Message.
+myString:this is a SimpleClass
+myBytes: [1] [2] [3]
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at InterSystems.Data.IRISClient.ADO.IRIS.CreateIRIS(IRISADOConnection conn)
+   at dc.MyLibrary.DoSomethingNative(String mqtttopic, String mqttmsg) in /source/mylib1/MyLibrary.cs:line 36
+Establishing new connection.
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at InterSystems.Data.IRISClient.ADO.IRIS.CreateIRIS(IRISADOConnection conn)
+   at dc.MyLibrary.DoSomethingSQL(String mqtttopic, String mqttmsg) in /source/mylib1/MyLibrary.cs:line 112
+Establishing new connection.
+Hit any key
+```
+
+## AVRO無関係のc#プロジェクト
+
+[myapp/ClassLibraryTest/Program.cs](dotnet60-dev/Sample/myapp/ClassLibraryTest/Program.cs)のビルドおよび実行
+
+```
+root@aa9e6466578e:/source# ./build.sh <== ごくシンプルなappの使用例
+root@aa9e6466578e:/source# /app/ClassLibraryTest <== 同実行方法
+Hello, World!
+GetNumber():123
+Establishing new connection.
+    ・
+    ・
+    ・
 ```
 
 

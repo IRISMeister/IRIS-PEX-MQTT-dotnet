@@ -38,12 +38,14 @@ namespace dc
             {
 
                 // Save bytes as a O/S file
+                /*
                 using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
                 {
                     fs.Write(item.myBytes, 0, item.myBytes.Length);
                 }                
+                */
 
-                long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, item.myFilename,"["+String.Join(",",item.myArray)+"]");
+                long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",item.myBytes)+"]","["+String.Join(",",item.myArray)+"]");
             }
 
             newrequest = (IRISObject)iris.ClassMethodObject("MQTT.REQ.Simple", "%New", seqno,topic);

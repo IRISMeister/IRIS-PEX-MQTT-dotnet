@@ -27,7 +27,7 @@ Property ReceiveTS As %Library.PosixTime [ InitialExpression = {##class(%Library
 
 Index idxseq On seq;
 
-Method %OnNew(topic As %String, seq As %BigInt, myInt As %Integer, myLong As %BigInt, myBool As %Boolean, myDouble As %Double, myFloat As %Float, myFilename As %String, myString As %String, myArray As %RawString) As %Status [ Private, ServerOnly = 1 ]
+Method %OnNew(topic As %String, seq As %BigInt, myInt As %Integer, myLong As %BigInt, myBool As %Boolean, myDouble As %Double, myFloat As %Float, myBytes As %String, myString As %String, myArray As %RawString) As %Status [ Private, ServerOnly = 1 ]
 {
     Set ..topic=topic
     Set ..seq=seq
@@ -36,7 +36,7 @@ Method %OnNew(topic As %String, seq As %BigInt, myInt As %Integer, myLong As %Bi
     Set ..myBool=myBool
     Set ..myDouble=myDouble
     Set ..myFloat=myFloat
-    Set ..myFilename=myFilename
+    Set ..myBytes=myBytes
     Set ..myString=myString
     Set ..myArray=myArray
     Return $$$OK

@@ -16,7 +16,7 @@ namespace dc
 	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("avrogen", "1.11.3")]
 	public partial class SimpleClass : global::Avro.Specific.ISpecificRecord
 	{
-		public static global::Avro.Schema _SCHEMA = global::Avro.Schema.Parse(@"{""type"":""record"",""name"":""SimpleClass"",""namespace"":""dc"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myFilename"",""type"":""string""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""long""}}]}");
+		public static global::Avro.Schema _SCHEMA = global::Avro.Schema.Parse(@"{""type"":""record"",""name"":""SimpleClass"",""namespace"":""dc"",""fields"":[{""name"":""myInt"",""type"":""int""},{""name"":""myLong"",""type"":""long""},{""name"":""myBool"",""type"":""boolean""},{""name"":""myDouble"",""type"":""double""},{""name"":""myFloat"",""type"":""float""},{""name"":""myBytes"",""type"":""bytes""},{""name"":""myFilename"",""type"":""string""},{""name"":""myString"",""type"":""string""},{""name"":""myArray"",""type"":{""type"":""array"",""items"":""double""}}]}");
 		private int _myInt;
 		private long _myLong;
 		private bool _myBool;
@@ -25,7 +25,7 @@ namespace dc
 		private byte[] _myBytes;
 		private string _myFilename;
 		private string _myString;
-		private IList<System.Int64> _myArray;
+		private IList<System.Double> _myArray;
 		public virtual global::Avro.Schema Schema
 		{
 			get
@@ -121,7 +121,7 @@ namespace dc
 				this._myString = value;
 			}
 		}
-		public IList<System.Int64> myArray
+		public IList<System.Double> myArray
 		{
 			get
 			{
@@ -160,7 +160,7 @@ namespace dc
 			case 5: this.myBytes = (System.Byte[])fieldValue; break;
 			case 6: this.myFilename = (System.String)fieldValue; break;
 			case 7: this.myString = (System.String)fieldValue; break;
-			case 8: this.myArray = (IList<System.Int64>)fieldValue; break;
+			case 8: this.myArray = (IList<System.Double>)fieldValue; break;
 			default: throw new global::Avro.AvroRuntimeException("Bad index " + fieldPos + " in Put()");
 			};
 		}

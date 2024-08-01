@@ -58,5 +58,5 @@ services:
     environment:
       - TZ=JST-9      
     volumes:
-      - ./netgw:/source2
+      - ./netgw:/netgw
       - ./datavol/share:/share

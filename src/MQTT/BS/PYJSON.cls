@@ -12,6 +12,7 @@ Method OnProcessInput(pInput As EnsLib.MQTT.Message, pOutput As %RegisteredObjec
 		#; Set ^log($INCREMENT(^log))=pInput.StringValue
 
 		Set seq=$INCREMENT(^seq)
+		#; Save()はPythonを使用しなくても実装可能。
 		#; Avroはバイナリ形式なので、(文字列ではなく)バイト列として渡す。
 		Set tSC=..Save(seq,pInput.Topic,##class(%SYS.Python).Bytes(pInput.StringValue))
 

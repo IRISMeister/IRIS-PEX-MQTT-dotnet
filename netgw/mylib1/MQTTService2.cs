@@ -37,13 +37,15 @@ namespace dc
             {
 
                 // Save bytes as a O/S file
+                /*
                 using (FileStream fs = new FileStream(item.myFilename, FileMode.Create, FileAccess.ReadWrite))
                 {
                     fs.Write(item.myBytes, 0, item.myBytes.Length);
                 }                
+                */
 
                 // Pass an array as a comma separated String value.
-                newrequest = new MQTTRequest(topic,seqno,item.myFilename,String.Join(",",item.myArray));
+                newrequest = new MQTTRequest(topic,seqno,String.Join(",",item.myBytes),String.Join(",",item.myArray));
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
                 foreach (string name in targetNames)

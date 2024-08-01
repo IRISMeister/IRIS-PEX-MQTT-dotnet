@@ -51,7 +51,7 @@ namespace dc
                 // get unique value via Native API
                 seqno = (long)iris.ClassMethodLong("MQTT.SimpleClass", "GETNEWID");
                 // Pass an array as a comma separated String value.
-                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,simple.myFilename,simple.myString,"["+String.Join(",",simple.myArray)+"]");
+                newrequest = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,simple.myInt,simple.myLong,simple.myBool,simple.myDouble,simple.myFloat,simple.myBytes,simple.myString,"["+String.Join(",",simple.myArray)+"]");
                 // Iterate through target business components and send request message
                 string[] targetNames = TargetConfigNames.Split(',');
                 foreach (string name in targetNames)

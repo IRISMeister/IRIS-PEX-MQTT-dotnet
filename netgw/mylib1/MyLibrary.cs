@@ -18,20 +18,6 @@ namespace dc
         {
             long seqno;
 
-            // Decode mqttmsg (raw data) into rows. It depends on how they are encoded.
-            //
-            // ++Write your code here++
-            int elementcount = 2000;
-            int columncount = 4;
-
-            int[] array = new int[elementcount];
-            for (int i = 0; i < elementcount; i++)
-            {
-                array[i] = i;
-            }
-            // --Write your code here--
-
-
             // Get connection
             IRIS iris = null;
             try
@@ -50,7 +36,7 @@ namespace dc
                     String port = "1972";
                     String username = "SuperUser";
                     String password = "SYS";
-                    String Namespace = "INTEROP";
+                    String Namespace = "AVRO";
                     IRISConnection connection = new IRISConnection();
                     connection.ConnectionString = "Server = " + host + "; Port = " + port + "; Namespace = " + Namespace + "; Password = " + password + "; User ID = " + username;
                     connection.Open();
@@ -65,18 +51,12 @@ namespace dc
             }
             // Native API
             // Save decoded values into IRIS via Native API
-            seqno = (long)iris.ClassMethodLong("Solution.RAWDATA", "GETNEWID");
-            IRISList list = new IRISList();
-            for (int i = 0; i < elementcount; i += columncount)
-            {
-                list.Clear();
-                for (int j = 0; j < columncount; j++) {
-                    list.Add(array[i+j]);
-                }
-                iris.ClassMethodStatusCode("Solution.RAWDATA", "INSERT", seqno, list);
-            }
+            seqno = (long)iris.ClassMethodLong("MQTT.RAWDATA", "GETNEWID");
+            //IRISList list = new IRISList();
+            String list="[1,2,3]";
+            iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, "mytopic",list,list);
 
-            IRISObject request = (IRISObject)iris.ClassMethodObject("Solution.RAWDATAC", "%New", seqno);
+            IRISObject request = (IRISObject)iris.ClassMethodObject("MQTT.RAWDATAC", "%New", seqno);
 
             return request;
         }
@@ -85,31 +65,7 @@ namespace dc
         {
             long seqno;
 
-            // Decode mqttmsg (raw data) into rows. It depends on how they are encoded.
-            //
-            // ++Write your code here++
-            int elementcount = 2000;
-            int columncount = 4;
-
-            int[] array = new int[elementcount];
-            for (int i = 0; i < elementcount; i++)
-            {
-                array[i] = i;
-            }
-            // --Write your code here--
-
-
-            // Get connection
-            // SQL always need its own connection 
-            String host = "iris";
-            String port = "1972";
-            String username = "SuperUser";
-            String password = "SYS";
-            String Namespace = "INTEROP";
-            IRISConnection connection = new IRISConnection();
-            connection.ConnectionString = "Server = " + host + "; Port = " + port + "; Namespace = " + Namespace + "; Password = " + password + "; User ID = " + username;
-            connection.Open();
-
+            IRISConnection connection = null;
             IRIS iris = null;
             try
             {
@@ -120,29 +76,34 @@ namespace dc
                 Console.WriteLine(e.ToString());
                 // consider we are not in External gateway server context
                 Console.WriteLine("Establishing new connection.");
+                // Get connection
+                // SQL always need its own connection 
+                String host = "iris";
+                String port = "1972";
+                String username = "SuperUser";
+                String password = "SYS";
+                String Namespace = "AVRO";
+                connection = new IRISConnection();
+                connection.ConnectionString = "Server = " + host + "; Port = " + port + "; Namespace = " + Namespace + "; Password = " + password + "; User ID = " + username;
+                connection.Open();
                 iris = IRIS.CreateIRIS(connection);
             }
 
-
-            seqno = (long)iris.ClassMethodLong("Solution.RAWDATA", "GETNEWID");
+            seqno = (long)iris.ClassMethodLong("MQTT.RAWDATA", "GETNEWID");
 
             // ADO.NET (relational)
-            String sqlStatement = "INSERT INTO Solution.RAWDATA (seq,p1,p2,p3,p4) VALUES (@seq,@p1,@p2,@p3,@p4)";
+            String sqlStatement = "INSERT INTO MQTT.RAWDATA (seq,l1,l2,l3,l4) VALUES (@seq,@p1,@p2,@p3,@p4)";
             IRISCommand cmd = new IRISCommand(sqlStatement, connection);
 
-            seqno = (long)iris.ClassMethodLong("Solution.RAWDATA", "GETNEWID");
+            seqno = (long)iris.ClassMethodLong("MQTT.RAWDATA", "GETNEWID");
 
-            // split array into columns
-            for (int i = 0; i < elementcount; i += columncount)
-            {
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@seq", seqno);
-                cmd.Parameters.AddWithValue("@p1", array[i]);
-                cmd.Parameters.AddWithValue("@p2", array[i + 1]);
-                cmd.Parameters.AddWithValue("@p3", array[i + 2]);
-                cmd.Parameters.AddWithValue("@p4", array[i + 3]);
-                cmd.ExecuteNonQuery();
-            }
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("@seq", seqno);
+            cmd.Parameters.AddWithValue("@p1", 1);
+            cmd.Parameters.AddWithValue("@p2", 2);
+            cmd.Parameters.AddWithValue("@p3", 3);
+            cmd.Parameters.AddWithValue("@p4", 4);
+            cmd.ExecuteNonQuery();
 
             // Return a message.
             IRISObject request = (IRISObject)iris.ClassMethodObject("Ens.StringContainer", "%New", seqno);
@@ -174,7 +135,7 @@ namespace dc
             String port = "1972";
             String username = "SuperUser";
             String password = "SYS";
-            String Namespace = "INTEROP";
+            String Namespace = "AVRO";
             IRISConnection connection = new IRISConnection();
             connection.ConnectionString = "Server = " + host + "; Port = " + port + "; Namespace = " + Namespace + "; Password = " + password + "; User ID = " + username;
             connection.Open();
