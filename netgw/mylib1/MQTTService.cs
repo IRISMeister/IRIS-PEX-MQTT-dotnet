@@ -47,7 +47,7 @@ namespace dc
 
                 long? rowid = iris.ClassMethodLong("MQTT.RAWDATA", "INSERT", seqno, topic, "["+String.Join(",",item.myBytes)+"]","["+String.Join(",",item.myArray)+"]");
             }
-
+/*
             newrequest = (IRISObject)iris.ClassMethodObject("MQTT.REQ.Simple", "%New", seqno,topic);
             // Iterate through target business components and send request message
             string[] targetNames = TargetConfigNames.Split(',');
@@ -56,7 +56,7 @@ namespace dc
                 //LOGINFO("Target:" + name);
                 SendRequestAsync(name, newrequest);
             }
-            
+*/            
             return null;
         }
 

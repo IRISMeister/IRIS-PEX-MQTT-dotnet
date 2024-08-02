@@ -313,6 +313,9 @@ vi Pub-AVRO.py localhost->linux1
 python3 Pub-AVRO.py 1
 ```
 
+SMPへのアクセス
+ssh -i azure.pem -L 8882:localhost:8882 azureuser@x.x.x.x
+
 ========================================
 デコード＋保存
 azureuser@linux1:~/IRIS-PEX-MQTT-dotnet$ 
@@ -334,16 +337,8 @@ docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasur
 
 ◎高速ネットワークを有効にした場合
 azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=1 ttl=64 time=1.78 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=2 ttl=64 time=0.807 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=3 ttl=64 time=1.31 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=4 ttl=64 time=1.62 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=5 ttl=64 time=1.36 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=6 ttl=64 time=2.05 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=7 ttl=64 time=1.52 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=8 ttl=64 time=1.20 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=9 ttl=64 time=1.06 ms
-64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=10 ttl=64 time=1.45 ms
+30 packets transmitted, 30 received, 0% packet loss, time 29046ms
+rtt min/avg/max/mdev = 0.817/1.405/6.071/1.164 ms
 
 avro
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
@@ -372,20 +367,10 @@ for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
 
 ◎高速ネットワークを無効にした場合
 azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
-PING linux1.niygjosa54xulgveevikrsghsb.lx.internal.cloudapp.net (10.0.0.4) 56(84) bytes of data.
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=1 ttl=64 time=1.79 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=2 ttl=64 time=1.85 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=3 ttl=64 time=1.35 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=4 ttl=64 time=1.39 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=5 ttl=64 time=1.67 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=6 ttl=64 time=1.14 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=7 ttl=64 time=3.52 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=8 ttl=64 time=2.49 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=9 ttl=64 time=1.16 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=10 ttl=64 time=1.07 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=11 ttl=64 time=2.07 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=12 ttl=64 time=1.23 ms
-64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=13 ttl=64 time=1.21 ms
+30 packets transmitted, 30 received, 0% packet loss, time 29045ms
+rtt min/avg/max/mdev = 0.804/1.124/2.537/0.404 ms
+
+>ping は高速有効時yよりむしろ早い...。
 
 送受信+デコード＋保存
 
