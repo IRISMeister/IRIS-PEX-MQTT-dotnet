@@ -50,7 +50,7 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PEX/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Adapter" Name="QOS">1</Setting>
-    <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
+    <!-- <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting> -->
   </Item>
   <Item Name="From_MQTT_PEX2" Category="" ClassName="MQTT.BS.MQTTPEX" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="%remoteClassname">dc.MQTTService2</Setting>
@@ -70,16 +70,16 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PEX3/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Adapter" Name="QOS">1</Setting>
-    <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting>
+    <!-- <Setting Target="Host" Name="%remoteSettings">TargetConfigNames=Process_MQTT</Setting> -->
   </Item>
   <Item Name="MQTT.BS.PYAVRO" Category="" ClassName="MQTT.BS.PYAVRO" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
+    <!--Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting> -->
     <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PYAVRO/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Adapter" Name="QOS">1</Setting>
   </Item>
   <Item Name="MQTT.BS.PYJSON" Category="" ClassName="MQTT.BS.PYJSON" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting>
+    <!-- <Setting Target="Host" Name="TargetConfigNames">Process_MQTT</Setting> -->
     <Setting Target="Adapter" Name="Topic">/XGH/EKG/ID_123/PYJSON/#</Setting>
     <Setting Target="Adapter" Name="Url">tcp://mqttbroker:1883</Setting>
     <Setting Target="Adapter" Name="QOS">1</Setting>

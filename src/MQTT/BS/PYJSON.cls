@@ -16,8 +16,8 @@ Method OnProcessInput(pInput As EnsLib.MQTT.Message, pOutput As %RegisteredObjec
 		#; Avroはバイナリ形式なので、(文字列ではなく)バイト列として渡す。
 		Set tSC=..Save(seq,pInput.Topic,##class(%SYS.Python).Bytes(pInput.StringValue))
 
-		;Set tRequest=##class(MQTT.REQ.Simple).%New(seq,pInput.Topic)
-		;Set tSC=##super(tRequest,pOutput)
+		Set tRequest=##class(MQTT.REQ.Simple).%New(seq,pInput.Topic)
+		Set tSC=##super(tRequest,pOutput)
 	} Catch e {
 		Set tSC=e.AsStatus()
 	}

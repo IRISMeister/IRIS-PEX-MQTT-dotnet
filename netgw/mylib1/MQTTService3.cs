@@ -49,7 +49,6 @@ namespace dc
                 newobject = (IRISObject)iris.ClassMethodObject("MQTT.SimpleClass", "%New", topic,seqno,item.myInt,item.myLong,item.myBool,item.myDouble,item.myFloat,item.myBytes,item.myString,"["+String.Join(",",item.myArray)+"]");
                 newobject.InvokeStatusCode("%Save");
             }
-/*
             newrequest = (IRISObject)iris.ClassMethodObject("MQTT.REQ.Simple", "%New", seqno,topic);
             // Iterate through target business components and send request message
             string[] targetNames = TargetConfigNames.Split(',');
@@ -58,7 +57,6 @@ namespace dc
                 //LOGINFO("Target:" + name);
                 SendRequestAsync(name, newrequest);
             }
-*/
             return null;
         }
 
