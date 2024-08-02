@@ -6,3 +6,4 @@ netgw/mylib1/obj
 dotnet60-dev/Sample/myapp/ClassLibraryTest/obj
 dotnet60-dev/Sample/mylib/ClassLibrary/obj
 netgw/DP-419090
+datavol/share/__pycache__/

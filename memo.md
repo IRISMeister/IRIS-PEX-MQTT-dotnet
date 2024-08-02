@@ -287,7 +287,8 @@ docker compose exec netgw /app/myapp
 
 ## install to bare O/S
 
-Azure: Standard D4s v3 (4 vcpu 数、16 GiB メモリ) Linux 22.04LTS、Diskは内蔵のみ、高速ネットワーク:有効 * 2台
+Azure: Standard D4s v3 (4 vcpu 数、16 GiB メモリ) 
+Ununtu Server 22.04 LTS x64 Gen2、Diskは内蔵のみ、高速ネットワーク:有効 * 2台
 
 IRIS+MQTT Broker
 ```
@@ -312,78 +313,89 @@ vi Pub-AVRO.py localhost->linux1
 python3 Pub-AVRO.py 1
 ```
 
-docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 3000
-
 ========================================
 デコード＋保存
 azureuser@linux1:~/IRIS-PEX-MQTT-dotnet$ 
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
 docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveFastAVRO.py 50000
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
-11.708975315093994
+[0]: [50000, 12511]
+[0]: [50000, 12565]
 
 azureuser@linux1:~/IRIS-PEX-MQTT-dotnet$ 
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
 docker compose exec iris /usr/irissys/bin/irispython /datavol/share/SaveJSON.py 50000
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
-9.861121654510498
+[0]: [50000, 13735]
+[0]: [50000, 13711]
 
 ========================================
 送受信+デコード＋保存
 
 ◎高速ネットワークを有効にした場合
 azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=1 ttl=64 time=1.78 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=2 ttl=64 time=0.807 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=3 ttl=64 time=1.31 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=4 ttl=64 time=1.62 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=5 ttl=64 time=1.36 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=6 ttl=64 time=2.05 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=7 ttl=64 time=1.52 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=8 ttl=64 time=1.20 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=9 ttl=64 time=1.06 ms
+64 bytes from l3.internal.cloudapp.net (10.0.0.5): icmp_seq=10 ttl=64 time=1.45 ms
 
 avro
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
 python3 Pub-AVRO.py 50000
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
-
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 50000 | 167095 |
+[0]: [50000, 184079]
 
 json
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchReset.py
 python3 Pub-JSON.py 50000
 docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasure.py
-
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 50000 | 162266 | <=JSONの勝ち。
-
+[0]: [50000, 184312]
 
 参考：PEX3, Native経由で%New()で保存するスタイル。
-python3 Pub-JSON.py 50000 PEX3
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 50000 | 397829 |
+python3 Pub-AVRO.py 50000 PEX3
+[0]: [50000, 284105]
+
+avro
+for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+
+json
+for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+
+
 
 
 ◎高速ネットワークを無効にした場合
 azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
 PING linux1.niygjosa54xulgveevikrsghsb.lx.internal.cloudapp.net (10.0.0.4) 56(84) bytes of data.
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=1 ttl=64 time=0.654 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=2 ttl=64 time=0.827 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=3 ttl=64 time=0.906 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=4 ttl=64 time=0.897 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=5 ttl=64 time=0.913 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=6 ttl=64 time=1.62 ms
-64 bytes from linux1.internal.cloudapp.net (10.0.0.4): icmp_seq=7 ttl=64 time=0.954 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=1 ttl=64 time=1.79 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=2 ttl=64 time=1.85 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=3 ttl=64 time=1.35 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=4 ttl=64 time=1.39 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=5 ttl=64 time=1.67 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=6 ttl=64 time=1.14 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=7 ttl=64 time=3.52 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=8 ttl=64 time=2.49 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=9 ttl=64 time=1.16 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=10 ttl=64 time=1.07 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=11 ttl=64 time=2.07 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=12 ttl=64 time=1.23 ms
+64 bytes from linux20.internal.cloudapp.net (10.0.0.7): icmp_seq=13 ttl=64 time=1.21 ms
 
 送受信+デコード＋保存
 
 avro
 python3 Pub-AVRO.py 50000
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 50000 | 183883 | <== AVROの勝ち
+[0]: [50000, 181848]   <==　なぜか無効のほうが速くなった...VM間の物理的な位置関係とか関係するのか？
 
-python3 Pub-JSON.py 50000
 json
-| Aggregate_1 | Expression_2 |
-| -- | -- |
-| 50000 | 194701 |
+python3 Pub-JSON.py 50000
+[0]: [50000, 180092]
 
 結論
 pythonのデコードの遅さが足を引っ張る。JSONと比べた際のAVROにそれほどの優位性は認められなかった。
@@ -395,8 +407,4 @@ Pythonのさらなる高速化に期待
 https://github.com/markshannon/faster-cpython/blob/master/plan.md
 
 ```
-
-
-
-
 
