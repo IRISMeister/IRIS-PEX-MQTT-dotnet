@@ -22,13 +22,16 @@ https://github.com/intersystems-community/irisdemo-demo-kafka How does the Demo 
 |IRIS| c#/Java(PEX) | IRIS上で実行 | AVROデコードのみc#/Javaで実行する方法|処理が冗長な分オーバヘッドが大きい|
 |IRIS| Python(埋め込み) | IRIS上で実行 | 簡潔 |
 
-## 今回はc# と Pythonを選択
+## 今回はPythonを選択
 
-理由：c#は、あまりサンプルが無いから。pythonはあまりに簡潔に実現できるから。さらに
+理由：c#は、あまりAVRO関連のサンプルが無いから。pythonを使うとあまりにも簡潔に実現できるから。
+c#使うなら、デコード処理のためだけにc#を介在させるよりは、デコードだけではなく、INSERT文の組み立て・実行までを、c#側で実装するほうが自然だから。
 
 c#のメリットは、AVROの定義からc#クラスを生成してくれるツールが存在すること。入力支援が有効になる。
-
 Pythonのメリットは、ダイナミックであること。埋め込みPythonが使えること。
+...と真逆の思想。
+
+とはいえ、サンプル実装はあるので、興味がありましたらどうぞ...。
 
 派生例としては、BSで受信後デコードせずに、ただちに保存(GlobalあるいはO/Sファイル)だけする。別のBSでデコード->INSERTする。
 この際、FIFOを考慮したデコード処理の並列化を検討すべき。
@@ -356,13 +359,67 @@ docker compose exec iris /usr/irissys/bin/irispython  /datavol/share/BenchMeasur
 python3 Pub-AVRO.py 50000 PEX3
 [0]: [50000, 284105]
 
-avro
-for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+上記を繰り返し実行した結果。
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+0,50000,106660
+0,50000,102919
+0,50000,107898
+0,50000,105728
+0,50000,102371
+0,50000,107596
+0,50000,107187
+0,50000,112106
+0,50000,109490
+0,50000,111245
 
-json
-for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+平均: 107320 (107秒)
 
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+0,50000,112897
+0,50000,111966
+0,50000,105887
+0,50000,108504
+0,50000,109766
+0,50000,109334
+0,50000,109909
+0,50000,108872
+0,50000,105355
+0,50000,103369
 
+平均: 108586 (109秒)
+
+殆ど差はない。
+
+では、ネットワークに負荷をかけている状態ではどうか？
+
+sudo apt install iperf3
+linux1:  iperf3 -s 
+linux2:  iperf3 -c linux1 -N -t 7200 -P 100
+
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+0,50000,122708
+0,50000,121958
+0,50000,136204
+0,50000,131718
+0,50000,132615
+0,50000,121797
+0,50000,127427
+0,50000,139289
+0,50000,120389
+0,50000,105303
+azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+0,50000,144755
+0,50000,136712
+0,50000,140608
+0,50000,142291
+0,50000,144148
+0,50000,154091
+0,50000,158519
+0,50000,152715
+0,50000,114578
+0,50000,160807
+
+差が広がったことが確認できる。
 
 
 ◎高速ネットワークを無効にした場合
@@ -370,7 +427,8 @@ azureuser@linux2:~/IRIS-PEX-MQTT-dotnet/datavol/share$ ping linux1
 30 packets transmitted, 30 received, 0% packet loss, time 29045ms
 rtt min/avg/max/mdev = 0.804/1.124/2.537/0.404 ms
 
->ping は高速有効時yよりむしろ早い...。
+>ping は高速有効時よりむしろ早い...。
+>同一ネットワーク構成内でのAVRO vs JSONの比率が大事なので、ここでは無視する。
 
 送受信+デコード＋保存
 
@@ -382,9 +440,64 @@ json
 python3 Pub-JSON.py 50000
 [0]: [50000, 180092]
 
+上記を繰り返し実行した結果。
+azureuser@linux20:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+0,50000,104550
+0,50000,102151
+0,50000,107142
+0,50000,103040
+0,50000,101654
+0,50000,106512
+0,50000,107171
+0,50000,109073
+0,50000,107096
+0,50000,103798
+azureuser@linux20:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+0,50000,107695
+0,50000,108502
+0,50000,104981
+0,50000,106960
+0,50000,106014
+0,50000,107928
+0,50000,104911
+0,50000,105243
+0,50000,102149
+0,50000,99727
+
+ネットワーク負荷をかけている状態では？
+
+azureuser@linux20:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-AVRO.py 50000 ; done
+0,50000,270904
+0,50000,136672
+0,50000,187577
+0,50000,122451
+0,50000,171286
+0,50000,183192
+0,50000,141121
+0,50000,118685
+0,50000,135554
+0,50000,163419
+azureuser@linux20:~/IRIS-PEX-MQTT-dotnet/datavol/share$ for i in {1..10} ; do python3 Pub-JSON.py 50000 ; done
+0,50000,355495
+0,50000,404830
+0,50000,346125
+0,50000,380983
+0,50000,386643
+0,50000,359443
+0,50000,124576
+0,50000,557044
+    ・
+    中断
+
+差がより顕著に現れる。
+
+
 結論
-pythonのデコードの遅さが足を引っ張る。JSONと比べた際のAVROにそれほどの優位性は認められなかった。
-通信がネックになる状況では、AVROの有用性が出てくる。
+pythonのデコードの遅さが足を引っ張るのでfastavroが有力。JSONと比べた際のAVROにそれほどの優位性は認められなかった。
+通信込みでも、通信トラフィックは増えているはずだが、パフォーマンス面でのAVRO, JSON間の差はほとんどない。
+混雑したネットワーク環境化では、差がでる。
+高速ネットワーク無効設定での混雑したネットワーク環境化では、差が顕著にでる。
+
 データの内容によっては差は拡大・縮小する。逆転もあり得る。
 (いつもの事ですが)要は使いどころ。
 
